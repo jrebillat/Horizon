@@ -11,14 +11,22 @@ public interface HorizonSubscriber
    public void onMessage(HorizonMessage message);
    
    /**
-    * Send a message. Please consider it carefully before overriding !
+    * Subscribe to a message type. Please consider it carefully before overriding !
     *
-    * @param receiver the receiver
     * @param id the id
-    * @param content the content
     */
-   public default void sendMessage(HorizonSubscriber receiver, String id, Object content)
+   public default void subscribe(String id)
    {
-      HorizonMessageManager.sendMessage(this, receiver, id, content);
+      HorizonMessageManager.addSubscription(id, this);
+   }
+   
+   /**
+    * Unsubscribe to a message type. Please consider it carefully before overriding !
+    *
+    * @param id the id
+    */
+   public default void unsubscribe(String id)
+   {
+      HorizonMessageManager.removeSubscription(id, this);
    }
 }

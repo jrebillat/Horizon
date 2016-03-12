@@ -16,4 +16,11 @@
       </plugin>
     </plugins>
   </build>
+  <dependencies>
+    <dependency>
+    	<groupId>io.github.lukehutch</groupId>
+    	<artifactId>fast-classpath-scanner</artifactId>
+    	<version>LATEST</version>
+	</dependency>
+  </dependencies>
 </project>

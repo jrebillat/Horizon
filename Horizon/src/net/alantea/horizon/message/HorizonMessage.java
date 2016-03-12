@@ -7,16 +7,19 @@ public class HorizonMessage
 {
    
    /** The sender. */
-   private HorizonSubscriber sender;
+   private Object sender;
    
    /** The receiver. */
-   private HorizonSubscriber receiver;
+   private Object receiver;
    
    /** The identifier. */
    private String id;
    
    /** The content. */
    private Object content;
+   
+   /** The confidential flag. */
+   private boolean confidential;
    
    /**
     * Instantiates a new message.
@@ -25,14 +28,16 @@ public class HorizonMessage
     * @param receiver the receiver
     * @param id the identifier
     * @param content the content
+    * @param conf the confidentiality
     */
-   public HorizonMessage(HorizonSubscriber sender, HorizonSubscriber receiver, String id, Object content)
+   public HorizonMessage(Object sender, Object receiver, String id, Object content, boolean conf)
    {
       super();
       this.sender = sender;
       this.receiver = receiver;
       this.id = id;
       this.content = content;
+      this.confidential = conf;
    }
 
    /**
@@ -40,7 +45,7 @@ public class HorizonMessage
     *
     * @return the sender
     */
-   public HorizonSubscriber getSender()
+   public Object getSender()
    {
       return sender;
    }
@@ -50,7 +55,7 @@ public class HorizonMessage
     *
     * @return the receiver
     */
-   public HorizonSubscriber getReceiver()
+   public Object getReceiver()
    {
       return receiver;
    }
@@ -73,6 +78,26 @@ public class HorizonMessage
    public Object getContent()
    {
       return content;
+   }
+
+   /**
+    * Checks if is confidential.
+    *
+    * @return true, if is confidential
+    */
+   public boolean isConfidential()
+   {
+      return confidential;
+   }
+
+   /**
+    * Sets the message as confidential.
+    *
+    * @param confidential the new confidentiality
+    */
+   public void setConfidential(boolean confidential)
+   {
+      this.confidential = confidential;
    }
 
 }
