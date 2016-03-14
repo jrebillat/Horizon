@@ -15,6 +15,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public final class HorizonMessageManager
 {
+   
+   /**
+    * The Enum Mode.
+    */
+   public enum Mode { THREADED, HYPERTHREADED, CONCURRENT, SYNCHRONOUS };
+   
    /** The "catch all" message constant. */
    public static final String DEFAULTID = "";
    
@@ -44,6 +50,9 @@ public final class HorizonMessageManager
    
    /** The listener classes map. */
    private static Map<Class<? extends Object>, Map<String, Method>> classesmap = new ConcurrentHashMap<>();
+   
+   /** The mesage sending mode. */
+   private static Mode mode = Mode.HYPERTHREADED;
    
    /**
     * Start queue thread.
@@ -127,14 +136,21 @@ public final class HorizonMessageManager
          return;
       }
       
-      if (queueThread == null)
+      if (mode == Mode.THREADED || mode == Mode.HYPERTHREADED)
       {
-         startQueueThread();
-      }
+         if (queueThread == null)
+         {
+            startQueueThread();
+         }
       
-      synchronized(queuelist)
+         synchronized(queuelist)
+         {
+            queuelist.add(message);
+         }
+      }
+      else
       {
-         queuelist.add(message);
+         sendSingleMessage(message);
       }
    }
    
@@ -368,19 +384,32 @@ public final class HorizonMessageManager
 
       if (method != null)
       {
-         try
+         if (mode == Mode.CONCURRENT || mode == Mode.HYPERTHREADED)
          {
-            method.setAccessible(true);
-            method.invoke(receiver, message);
+            final Method theMethod = method;
+            new Thread(() -> sendToMethod(theMethod, receiver, message)).start();
          }
-         catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+         else
          {
-            e.printStackTrace();
-            // it is a pity...
+            sendToMethod(method, receiver, message);
          }
       }
    }
-   
+
+   private static void sendToMethod(Method method, Object receiver, HorizonMessage message)
+   {
+      try
+      {
+         method.setAccessible(true);
+         method.invoke(receiver, message);
+      }
+      catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+      {
+         e.printStackTrace();
+         // it is a pity...
+      }
+   }
+
    /**
     * Gets the method.
     *
@@ -480,6 +509,7 @@ public final class HorizonMessageManager
       {
          return;
       }
+      
       if (message.getReceiver() != null)
       {
          sendMessageToReceiver(message,  message.getReceiver());
