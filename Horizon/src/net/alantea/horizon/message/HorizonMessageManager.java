@@ -49,7 +49,7 @@ public final class HorizonMessageManager
    private static Map<Object, List<Object>> listenermap = new ConcurrentHashMap<>();
    
    /** The listener classes map. */
-   private static Map<Class<? extends Object>, Map<String, Method>> classesmap = new ConcurrentHashMap<>();
+   private static Map<Class<? extends Object>, Map<String, Map<Class<?>, Method>>> classesmap = new ConcurrentHashMap<>();
    
    /** The mesage sending mode. */
    private static Mode mode = Mode.HYPERTHREADED;
@@ -356,8 +356,12 @@ public final class HorizonMessageManager
    {
       Class<?> theClass = receiver.getClass();
 
-      Method method = getMethod(receiver.getClass(), message.getIdentifier());
+      Method method = getMethod(receiver.getClass(), message.getIdentifier(), message.getContent().getClass());
 
+      if (method == null)
+      {
+         method = getMethod(receiver.getClass(), message.getIdentifier(), HorizonMessage.class);
+      }
       if (method == null)
       {
          String methodName = METHODHEADER + message.getIdentifier() + METHODFOOTER;
@@ -401,7 +405,14 @@ public final class HorizonMessageManager
       try
       {
          method.setAccessible(true);
-         method.invoke(receiver, message);
+         if (method.getParameterTypes()[0].isAssignableFrom(HorizonMessage.class))
+         {
+            method.invoke(receiver, message);
+         }
+         else if (method.getParameterTypes()[0].isAssignableFrom(message.getContent().getClass()))
+         {
+            method.invoke(receiver, message.getContent());
+         }
       }
       catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
       {
@@ -417,14 +428,29 @@ public final class HorizonMessageManager
     * @param id the id identifier searched for
     * @return the method found or null
     */
-   private static Method getMethod(Class<?> cl, String id)
+   private static Method getMethod(Class<?> cl, String id, Class<?> param)
    {
-      Map<String, Method> map = getMethods(cl);
-      Method ret = map.get(id);
+      Map<String, Map<Class<?>, Method>> map = getMethods(cl);
+      Map<Class<?>, Method> meths = map.get(id);
+      if (meths == null)
+      {
+         return null;
+      }
       
+      Method ret = meths.get(param);
+      
+      // search for parameter superclasses
+      Class<?> superparam = param.getSuperclass();
+      while ((ret == null) && (superparam != null) && ((!superparam.equals(Object.class))))
+      {
+         ret = getMethod(cl, id, superparam);
+         superparam = superparam.getSuperclass();
+      }
+      
+      // take default
       if ((ret == null) && (!DEFAULTID.equals(id)))
       {
-         ret = getMethod(cl, DEFAULTID);
+         ret = getMethod(cl, DEFAULTID, param);
       }
       return ret;
    }
@@ -437,7 +463,7 @@ public final class HorizonMessageManager
     */
    private static int registerToMessages(Object object)
    {
-      Map<String, Method> map = getMethods(object);
+      Map<String, Map<Class<?>, Method>> map = getMethods(object);
       map.forEach((id, meth) ->
       {
          addSubscription(id, object);
@@ -450,7 +476,7 @@ public final class HorizonMessageManager
     *
     * @param listener the listener
     */
-   private static final Map<String, Method> getMethods(Object listener)
+   private static final Map<String, Map<Class<?>, Method>> getMethods(Object listener)
    {
       Class<?> theClass;
       if (listener instanceof Class<?>)
@@ -462,42 +488,74 @@ public final class HorizonMessageManager
          theClass = listener.getClass();
       }
 
-      Map<String, Method> methodmap = classesmap.get(theClass);
+      Map<String, Map<Class<?>, Method>> methodmap = classesmap.get(theClass);
       if (methodmap == null)
       {
+         methodmap = getSubMethodMap(theClass);
+         classesmap.put(theClass,  methodmap);
+      }
+      return methodmap;
+   }
+   
+   private static Map<String, Map<Class<?>, Method>> getSubMethodMap(Class<?> cl)
+   {
          // Search for compatible methods
-         methodmap = new ConcurrentHashMap<>();
-         Method[] methods = theClass.getMethods();
+      Map<String, Map<Class<?>, Method>> methodmap = new ConcurrentHashMap<>();
+      if (cl == null)
+      {
+         return methodmap;
+      }
+      if (!cl.equals(Object.class))
+      {
+         for (Class<?> cl1 : cl.getInterfaces())
+         {
+            methodmap.putAll(getSubMethodMap(cl1));
+         }
+         methodmap.putAll(getSubMethodMap(cl.getSuperclass()));
+      }
+         Method[] methods = cl.getDeclaredMethods();
          for (Method method : methods)
          {
-            if ((method.getParameterCount() == 1)
-                  && (method.getParameterTypes()[0].isAssignableFrom(HorizonMessage.class)))
+            if (method.getParameterCount() == 1)
+                //  && (method.getParameterTypes()[0].isAssignableFrom(HorizonMessage.class)))
             {
                if (method.isAnnotationPresent(Listen.class))
                {
                   Listen annotation =  method.getAnnotation(Listen.class);
                   if (!DEFAULTID.equals(annotation.message()))
                   {
-                     methodmap.put(annotation.message(), method);
+                     method.setAccessible(true);
+                     Map<Class<?>, Method> meths = methodmap.get(annotation.message());
+                     if (meths == null)
+                     {
+                        meths = new HashMap<>();
+                     }
+                     meths.put(method.getParameterTypes()[0], method);
+                     methodmap.put(annotation.message(), meths);
                   }
                }
-               else 
+               else if (method.getParameterTypes()[0].isAssignableFrom(HorizonMessage.class))
                {
                   String name = method.getName();
                   if ((name.startsWith(METHODHEADER))
                         && (name.endsWith(METHODFOOTER)))
                   {
                      String id = name.substring(METHODHEADER.length(), name.length() - METHODFOOTER.length());
-                     methodmap.put(id, method);
+                     method.setAccessible(true);
+                     Map<Class<?>, Method> meths = methodmap.get(id);
+                     if (meths == null)
+                     {
+                        meths = new HashMap<>();
+                     }
+                     meths.put(method.getParameterTypes()[0], method);
+                     methodmap.put(id, meths);
                   }
                }
             }
          }
-         classesmap.put(theClass,  methodmap);
-      }
-      return methodmap;
+         return methodmap;
    }
-   
+
    /**
     * Send immediately a single message.
     *
