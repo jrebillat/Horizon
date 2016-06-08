@@ -3,7 +3,7 @@ package net.alantea.horizon.message;
 /**
  * The Interface HorizonSource. Please do not try to override default methods !
  */
-public interface MessageSource
+public interface HorizonSource
 {
    
    /**
@@ -13,7 +13,7 @@ public interface MessageSource
     */
    public default void sendMessage(String name)
    {
-      Messenger.sendMessage(new Message(this, null, name, null, false));
+      MessageManager.sendMessage(new Message(this, null, name, null, false));
    }
    
    /**
@@ -24,7 +24,7 @@ public interface MessageSource
     */
    public default void sendMessage(String name, Object parameters)
    {
-      Messenger.sendMessage(new Message(this, null, name, parameters, false));
+      MessageManager.sendMessage(new Message(this, null, name, parameters, false));
    }
    
    /**
@@ -34,7 +34,7 @@ public interface MessageSource
     */
    public default void sendMessage(Message message)
    {
-      Messenger.sendMessage(message);
+      MessageManager.sendMessage(message);
    }
    
    /**
@@ -44,7 +44,7 @@ public interface MessageSource
     */
    public default void addHorizonListener(Object listener)
    {
-      Messenger.addHorizonListener(this, listener);
+      MessageManager.addHorizonListener(this, listener);
    }
    
    /**
@@ -54,7 +54,7 @@ public interface MessageSource
     */
    public default void removeHorizonListener(Object listener)
    {
-      Messenger.removeHorizonListener(this, listener);
+      MessageManager.removeHorizonListener(this, listener);
    }
    
    /**
@@ -66,7 +66,7 @@ public interface MessageSource
     */
    public default void sendMessage(Object receiver, String id, Object content)
    {
-      Messenger.sendMessage(this, receiver, id, content, false);
+      MessageManager.sendMessage(this, receiver, id, content, false);
    }
    
    /**
@@ -78,6 +78,6 @@ public interface MessageSource
     */
    public default void sendConfidentialMessage(Object receiver, String id, Object content)
    {
-      Messenger.sendMessage(this, receiver, id, content, true);
+      MessageManager.sendMessage(this, receiver, id, content, true);
    }
 }

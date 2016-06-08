@@ -13,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * The Class HorizonMessageManager.
  */
-public final class Messenger
+public final class MessageManager
 {
    
    /**
@@ -109,7 +109,7 @@ public final class Messenger
    
    /**
     * Register to all messages that we are waiting for. This method search for all @Listen(message="ID") or
-    * &#64;Listen(messages={"ID1", "ID2"...}) annotations. It also look to all "onXXXXMessage" methods using
+    * @Listen(messages={"ID1", "ID2"...}) annotations. It also look to all "onXXXXMessage" methods using
     * XXXX as ID. Then it subscribes the object to all corresponding IDs messages.
     *
     * @param object the object
@@ -279,7 +279,6 @@ public final class Messenger
     *
     * @param horizonSource the horizon source
     * @param listener the listener
-    * @return true, if successful
     */
    public static final boolean addHorizonListener(Object horizonSource, Object listener)
    {
@@ -311,7 +310,6 @@ public final class Messenger
     *
     * @param horizonSource the horizon source
     * @param listener the listener
-    * @return true, if successful
     */
    public static final boolean removeHorizonListener(Object horizonSource, Object listener)
    {
@@ -335,7 +333,6 @@ public final class Messenger
     * Removes all horizon listeners from a specific source.
     *
     * @param horizonSource the horizon source
-    * @return true, if successful
     */
    public static final boolean removeAllHorizonListeners(Object horizonSource)
    {

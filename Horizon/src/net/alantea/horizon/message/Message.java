@@ -3,7 +3,7 @@ package net.alantea.horizon.message;
 /**
  * The Message class.
  */
-public class HorizonMessage
+public class Message
 {
    
    /** The sender. */
@@ -30,7 +30,7 @@ public class HorizonMessage
     * @param content the content
     * @param conf the confidentiality
     */
-   public HorizonMessage(Object sender, Object receiver, String id, Object content, boolean conf)
+   public Message(Object sender, Object receiver, String id, Object content, boolean conf)
    {
       super();
       this.sender = sender;

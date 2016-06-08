@@ -1,6 +1,6 @@
 package net.alantea.horizon.message;
 
-public interface MessageSubscriber
+public interface HorizonSubscriber
 {
    
    /**
@@ -17,7 +17,7 @@ public interface MessageSubscriber
     */
    public default void subscribe(String id)
    {
-      Messenger.addSubscription(id, this);
+      MessageManager.addSubscription(id, this);
    }
    
    /**
@@ -27,6 +27,6 @@ public interface MessageSubscriber
     */
    public default void unsubscribe(String id)
    {
-      Messenger.removeSubscription(id, this);
+      MessageManager.removeSubscription(id, this);
    }
 }
