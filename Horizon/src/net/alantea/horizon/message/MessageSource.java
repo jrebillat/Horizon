@@ -1,7 +1,7 @@
 package net.alantea.horizon.message;
 
 /**
- * The Interface HorizonSource. Please do not try to override default methods !
+ * The Interface MessageSource. Please do not try to override default methods !
  */
 public interface MessageSource
 {

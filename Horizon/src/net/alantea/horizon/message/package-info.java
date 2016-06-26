@@ -1,9 +1,9 @@
 /**
  * This package contains a pretty simple messaging mechanism between objects in Java.
- * Any object (mainly those implementing the <code>HorizonSubscriber</code> interface) may send a
- * message to any other object (preferred is <code>HorizonSubscriber</code> object), using the method :
- * <code>sender.sendMessage(HorizonSubscriber receiver, String id, Object content);</code> if it
- * is an HorizonSubscriber, or one of the HorizonMessageManager.sendMessage(...) methods.
+ * Any object (mainly those implementing the <code>MessageSubscriber</code> interface) may send a
+ * message to any other object (preferred is <code>MessageSubscriber</code> object), using the method :
+ * <code>sender.sendMessage(MessageSubscriber receiver, String id, Object content);</code> if it
+ * is an MessageSubscriber, or one of the Messenger.sendMessage(...) methods.
  *  <p>
  *  The receiver will receive an <code>HorizonMessage</code> through one of the three
  *  following mechanism :

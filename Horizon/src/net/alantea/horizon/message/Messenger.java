@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * The Class HorizonMessageManager.
+ * The Class Messenger.
  */
 public final class Messenger
 {
@@ -208,18 +208,6 @@ public final class Messenger
    }
    
    /**
-    * Send synchronous message to the world.
-    *
-    * @param sender the sender
-    * @param id the id
-    * @param content the content
-    */
-   public static final void sendSynchronousMessage(Object sender, String id, Object content)
-   {
-      sendSingleMessage(new Message(sender, null, id, content, false));
-   }
-   
-   /**
     * Send message to the world.
     *
     * @param sender the sender
@@ -229,6 +217,18 @@ public final class Messenger
    public static final void sendMessage(Object sender, String id, Object content)
    {
       sendMessage(new Message(sender, null, id, content, false));
+   }
+   
+   /**
+    * Send synchronous message to the world.
+    *
+    * @param sender the sender
+    * @param id the id
+    * @param content the content
+    */
+   public static final void sendSynchronousMessage(Object sender, String id, Object content)
+   {
+      sendSingleMessage(new Message(sender, null, id, content, false));
    }
    
    /**
@@ -277,25 +277,25 @@ public final class Messenger
    /**
     * Adds a horizon listener to a specific source.
     *
-    * @param horizonSource the horizon source
+    * @param object the horizon source
     * @param listener the listener
     * @return true, if successful
     */
-   public static final boolean addHorizonListener(Object horizonSource, Object listener)
+   public static final boolean addHorizonListener(Object object, Object listener)
    {
-      if ((horizonSource == null) || (listener == null))
+      if ((object == null) || (listener == null))
       {
          return false;
       }
       
       synchronized(listenermap)
       {
-         List<Object> listeners = listenermap.get(horizonSource);
+         List<Object> listeners = listenermap.get(object);
          
          if (listeners == null)
          {
             listeners = new CopyOnWriteArrayList<>();
-            listenermap.put(horizonSource, listeners);
+            listenermap.put(object, listeners);
          }
          if (!listeners.contains(listener))
          {
@@ -309,15 +309,15 @@ public final class Messenger
    /**
     * Removes a horizon listener from a specific source.
     *
-    * @param horizonSource the horizon source
+    * @param object the horizon source
     * @param listener the listener
     * @return true, if successful
     */
-   public static final boolean removeHorizonListener(Object horizonSource, Object listener)
+   public static final boolean removeHorizonListener(Object object, Object listener)
    {
       synchronized(listenermap)
       {
-         List<Object> listeners = listenermap.get(horizonSource);
+         List<Object> listeners = listenermap.get(object);
          
          if (listeners != null)
          {
@@ -334,14 +334,14 @@ public final class Messenger
    /**
     * Removes all horizon listeners from a specific source.
     *
-    * @param horizonSource the horizon source
+    * @param object the horizon source
     * @return true, if successful
     */
-   public static final boolean removeAllHorizonListeners(Object horizonSource)
+   public static final boolean removeAllHorizonListeners(Object object)
    {
       synchronized(listenermap)
       {
-         List<Object> listeners = listenermap.get(horizonSource);
+         List<Object> listeners = listenermap.get(object);
          
          if (listeners != null)
          {
@@ -483,7 +483,8 @@ public final class Messenger
          superparam = superparam.getSuperclass();
       }
       
-      // search for parameter interfaces (but just one level deep, don't get interfaces extended by interfaces)
+      // search for parameter interfaces (but just one level deep, 
+      // don't get interfaces extended by interfaces)
       if ((ret == null))
       {
          superparam = param;
@@ -551,23 +552,34 @@ public final class Messenger
          theClass = listener.getClass();
       }
 
-      Map<String, Map<Class<?>, Method>> methodmap = classesmap.get(theClass);
-      if (methodmap == null)
-      {
-         methodmap = getSubMethodMap(theClass);
-         classesmap.put(theClass,  methodmap);
-      }
+      Map<String, Map<Class<?>, Method>> methodmap = getSubMethodMap(theClass);
+      classesmap.put(theClass,  methodmap);
       return methodmap;
    }
    
+   /**
+    * Gets the sub method map.
+    *
+    * @param cl the cl
+    * @return the sub method map
+    */
    private static Map<String, Map<Class<?>, Method>> getSubMethodMap(Class<?> cl)
    {
-         // Search for compatible methods
-      Map<String, Map<Class<?>, Method>> methodmap = new ConcurrentHashMap<>();
+      // Test silly call
       if (cl == null)
+      {
+         return new ConcurrentHashMap<>();
+      }
+      
+      // Test if we already have done the work.
+      Map<String, Map<Class<?>, Method>> methodmap = classesmap.get(cl);
+      if (methodmap != null)
       {
          return methodmap;
       }
+      
+      // Search for compatible methods in interfaces (for default methods) and superclass.
+      methodmap = new ConcurrentHashMap<>();
       if (!cl.equals(Object.class))
       {
          for (Class<?> cl1 : cl.getInterfaces())
@@ -576,11 +588,12 @@ public final class Messenger
          }
          methodmap.putAll(getSubMethodMap(cl.getSuperclass()));
       }
+      
+      // Get methods declared in class itself
          Method[] methods = cl.getDeclaredMethods();
          for (Method method : methods)
          {
             if (method.getParameterCount() == 1)
-                //  && (method.getParameterTypes()[0].isAssignableFrom(HorizonMessage.class)))
             {
                if (method.isAnnotationPresent(Listen.class))
                {
