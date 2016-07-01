@@ -13,7 +13,7 @@ public interface MessageSource
     */
    public default void sendMessage(String name)
    {
-      Messenger.sendMessage(new Message(this, null, name, null, false));
+      Messenger.sendMessage(new Message(this, null, name, "", false));
    }
    
    /**
