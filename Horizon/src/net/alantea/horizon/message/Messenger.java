@@ -676,6 +676,10 @@ public final class Messenger
     */
    private static void sendSingleMessage(Message message)
    {
+      if (message == null)
+      {
+         return;
+      }
       if (message.getReceiver() != null)
       {
          sendMessageToReceiver(message, message.getReceiver());
