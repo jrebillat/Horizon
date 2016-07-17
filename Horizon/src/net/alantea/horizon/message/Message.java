@@ -18,6 +18,9 @@ public class Message
    /** The content. */
    private Object content;
    
+   /** The context. */
+   private Object context;
+   
    /** The confidential flag. */
    private boolean confidential;
    
@@ -30,13 +33,14 @@ public class Message
     * @param content the content
     * @param conf the confidentiality
     */
-   public Message(Object sender, Object receiver, String id, Object content, boolean conf)
+   public Message(Object sender, Object receiver, String id, Object content, Object context, boolean conf)
    {
       super();
       this.sender = sender;
       this.receiver = receiver;
       this.id = id;
       this.content = content;
+      this.context = context;
       this.confidential = conf;
    }
 
@@ -81,6 +85,26 @@ public class Message
    }
 
    /**
+    * Gets the context.
+    *
+    * @return the context
+    */
+   public Object getContext()
+   {
+      return context;
+   }
+
+   /**
+    * Verify context coherency.
+    *
+    * @return the content
+    */
+   public boolean isInContext(Object neededContext)
+   {
+      return ((context == null) || (context.equals(neededContext)));
+   }
+
+   /**
     * Checks if is confidential.
     *
     * @return true, if is confidential
@@ -100,4 +124,9 @@ public class Message
       this.confidential = confidential;
    }
 
+   @Override
+   public String toString()
+   {
+      return "Message : sender=" + sender + ", receiver=" + receiver + ", id=" + id + ", content=" + content +", confidential=" + confidential;
+   }
 }

@@ -36,6 +36,12 @@ public final class Messenger
    /** The "catch all" message constant. */
    public static final String DEFAULTID = "";
 
+   /** The default context constant. */
+   public static final String DEFAULTCONTEXT = "__Default C0ntext__";
+
+   /** The "catch all" context constant. */
+   public static final String ALLCONTEXTS = "__All C0ntexts__";
+
    /** The Constant DEFAULTINTERVAL. */
    private static final int DEFAULTINTERVAL = 250;
 
@@ -58,7 +64,7 @@ public final class Messenger
    private static List<Object> catchAllList = new ArrayList<>();
 
    /** The subscribe map. */
-   private static Map<String, List<Object>> subscribeMap = new HashMap<>();
+   private static Map<String, Map<Object, List<Object>>> subscribeMap = new HashMap<>();
 
    /** The listener map. */
    private static Map<Object, List<Object>> listenermap = new ConcurrentHashMap<>();
@@ -69,34 +75,6 @@ public final class Messenger
    /** The message sending mode. */
    private static Mode mode = Mode.HYPERTHREADED;
 
-   /**
-    * Start queue thread.
-    */
-   private static void startQueueThread()
-   {
-      queueThread = new Thread(() -> {
-         while (true)
-         {
-            Message message;
-            do
-            {
-               message = queuelist.poll();
-               sendSingleMessage(message);
-            }
-            while (message != null);
-            try
-            {
-               Thread.sleep(interval);
-            }
-            catch (Exception e)
-            {
-               // really : don't care !
-            }
-         }
-      });
-      queueThread.setDaemon(true);
-      queueThread.start();
-   }
 
    /**
     * Sets the interval between message list polling.
@@ -132,11 +110,26 @@ public final class Messenger
     */
    public static int register(Object object)
    {
+      return register(object, ALLCONTEXTS);
+   }
+
+   /**
+    * Register to all messages that we are waiting for in the context. This method search for
+    * all @Listen(message="ID") or &#64;Listen(messages={"ID1", "ID2"...}) annotations. It also look
+    * to all "onXXXXMessage" methods using XXXX as ID. Then it subscribes the object to all
+    * corresponding IDs messages.
+    *
+    * @param object the object
+    * @param object the object
+    * @return the number of messages ID registered
+    */
+   public static int register(Object object, Object context)
+   {
       if (object == null)
       {
          return 0;
       }
-      return registerToMessages(object);
+      return registerToMessages(object, context);
    }
 
    /**
@@ -182,6 +175,31 @@ public final class Messenger
    }
 
    /**
+    * Send synchronous message to the world.
+    *
+    * @param sender the sender
+    * @param id the id
+    * @param content the content
+    */
+   public static final void sendSynchronousMessage(Object sender, String id, Object content)
+   {
+      sendSingleMessage(new Message(sender, null, id, content, null, false));
+   }
+
+   /**
+    * Send synchronous message to the world.
+    *
+    * @param sender the sender
+    * @param id the id
+    * @param content the content
+    * @param content the context
+    */
+   public static final void sendSynchronousMessage(Object sender, String id, Object content, Object context)
+   {
+      sendSingleMessage(new Message(sender, null, id, content, context, false));
+   }
+
+   /**
     * Send synchronous message to a receiver.
     *
     * @param sender the sender
@@ -193,7 +211,90 @@ public final class Messenger
    public static final void sendSynchronousMessage(Object sender, Object receiver, String id, Object content,
          boolean conf)
    {
-      sendSingleMessage(new Message(sender, receiver, id, content, conf));
+      sendSingleMessage(new Message(sender, receiver, id, content, null, conf));
+   }
+
+   /**
+    * Send synchronous message to a receiver.
+    *
+    * @param sender the sender
+    * @param receiver the receiver
+    * @param id the id
+    * @param content the content
+    * @param content the context
+    * @param conf the confidentiality
+    */
+   public static final void sendSynchronousMessage(Object sender, Object receiver, String id, Object content,
+         Object context, boolean conf)
+   {
+      sendSingleMessage(new Message(sender, receiver, id, content, context, conf));
+   }
+
+   /**
+    * Send message to the world.
+    *
+    * @param sender the sender
+    * @param id the id
+    * @param content the content
+    */
+   public static final void sendMessage(Object sender, String id, Object content)
+   {
+      sendMessage(sender, null, id, content, null, false);
+   }
+
+   /**
+    * Send confidential message to a receiver.
+    *
+    * @param sender the sender
+    * @param receiver the receiver
+    * @param id the id
+    * @param content the content
+    */
+   public static final void sendConfidentialMessage(Object sender, Object receiver, String id, Object content)
+   {
+      sendMessage(sender, receiver, id, content, true);
+   }
+
+   /**
+    * Send message to a receiver.
+    *
+    * @param sender the sender
+    * @param receiver the receiver
+    * @param id the id
+    * @param content the content
+    * @param conf the confidentiality
+    */
+   public static final void sendMessage(Object sender, Object receiver, String id, Object content, boolean conf)
+   {
+      sendMessage(sender, receiver, id, content, null, conf);
+   }
+
+   /**
+    * Send message to the world.
+    *
+    * @param sender the sender
+    * @param id the id
+    * @param content the content
+    * @param context the context
+    */
+   public static final void sendMessage(Object sender, String id, Object content, Object context)
+   {
+      sendMessage(sender, null, id, content, context, false);
+   }
+
+   /**
+    * Send message to a receiver.
+    *
+    * @param sender the sender
+    * @param receiver the receiver
+    * @param id the id
+    * @param content the content
+    * @param context the context
+    * @param conf the confidentiality
+    */
+   public static final void sendMessage(Object sender, Object receiver, String id, Object content, Object context, boolean conf)
+   {
+      sendMessage(new Message(sender, receiver, id, content, context, conf));
    }
 
    /**
@@ -229,73 +330,31 @@ public final class Messenger
    }
 
    /**
-    * Send message to a receiver.
-    *
-    * @param sender the sender
-    * @param receiver the receiver
-    * @param id the id
-    * @param content the content
-    * @param conf the confidentiality
-    */
-   public static final void sendMessage(Object sender, Object receiver, String id, Object content, boolean conf)
-   {
-      sendMessage(new Message(sender, receiver, id, content, conf));
-   }
-
-   /**
-    * Send confidential message to a receiver.
-    *
-    * @param sender the sender
-    * @param receiver the receiver
-    * @param id the id
-    * @param content the content
-    */
-   public static final void sendMessage(Object sender, Object receiver, String id, Object content)
-   {
-      sendMessage(sender, receiver, id, content, true);
-   }
-
-   /**
-    * Send message to the world.
-    *
-    * @param sender the sender
-    * @param id the id
-    * @param content the content
-    */
-   public static final void sendMessage(Object sender, String id, Object content)
-   {
-      sendMessage(sender, null, id, content, false);
-   }
-
-   /**
-    * Send synchronous message to the world.
-    *
-    * @param sender the sender
-    * @param id the id
-    * @param content the content
-    */
-   public static final void sendSynchronousMessage(Object sender, String id, Object content)
-   {
-      sendSingleMessage(new Message(sender, null, id, content, false));
-   }
-
-   /**
     * Add a subscriber to a message type.
     *
     * @param id the id
     * @param subscriber the subscriber
+    * @param context the context or null
     */
-   public static final void addSubscription(String id, Object subscriber)
+   public static final void addSubscription(String id, Object subscriber, Object context)
    {
       if ((id == null) || subscriber == null)
       {
          return;
       }
-      List<Object> list = subscribeMap.get(id);
+      Object realContext = (context == null) ? DEFAULTCONTEXT : context;
+      
+      Map<Object, List<Object>> contextMap = subscribeMap.get(id);
+      if (contextMap == null)
+      {
+         contextMap = new HashMap<Object, List<Object>>();
+         subscribeMap.put(id, contextMap);
+      }
+      List<Object> list = contextMap.get(realContext);
       if (list == null)
       {
          list = new ArrayList<Object>();
-         subscribeMap.put(id, list);
+         contextMap.put(realContext, list);
       }
       if (!list.contains(subscriber))
       {
@@ -311,11 +370,30 @@ public final class Messenger
     */
    public static final void removeSubscription(String id, Object subscriber)
    {
+      removeSubscription(id, null, subscriber);
+   }
+
+   /**
+    * remove a subscriber from a message type.
+    *
+    * @param id the id
+    * @param context the context or null
+    * @param subscriber the subscriber
+    */
+   public static final void removeSubscription(String id, Object context, Object subscriber)
+   {
       if ((id == null) || subscriber == null)
       {
          return;
       }
-      List<Object> list = subscribeMap.get(id);
+      Object realContext = (context == null) ? DEFAULTCONTEXT : context;
+      
+      Map<Object, List<Object>> contextMap = subscribeMap.get(id);
+      if (contextMap == null)
+      {
+         return;
+      }
+      List<Object> list = contextMap.get(realContext);
       if ((list != null) && (list.contains(subscriber)))
       {
          list.remove(subscriber);
@@ -416,19 +494,59 @@ public final class Messenger
    }
 
    /**
+    * Send immediately a single message.
+    *
+    * @param message the message
+    */
+   private static void sendSingleMessage(Message message)
+   {
+      if (message == null)
+      {
+         return;
+      }
+      if (message.getReceiver() != null)
+      {
+         sendMessageToReceiver(message, message.getReceiver());
+      }
+      if (!message.isConfidential())
+      {
+         sendToWorld(message);
+      }
+   }
+
+   /**
     * Send message to all subscribers.
     *
     * @param message the message
     */
    private static void sendToWorld(Message message)
    {
-      List<Object> list = subscribeMap.get(message.getIdentifier());
-      if (list != null)
+      Object context = (message.getContext() == null) ? DEFAULTCONTEXT : message.getContext();
+      Map<Object, List<Object>> contextMap = subscribeMap.get(message.getIdentifier());
+      if (contextMap != null)
       {
-
-         list.forEach((listener) -> {
-            sendMessageToReceiver(message, listener);
-         });
+         if (context.equals(ALLCONTEXTS))
+         {
+            contextMap.keySet().forEach((ctx) -> {
+               List<Object> list = contextMap.get(ctx);
+               if (list != null)
+               {
+                  list.forEach((listener) -> {
+                     sendMessageToReceiver(message, listener);
+                  });
+               }
+            }); 
+         }
+         else
+         {
+            List<Object> list = contextMap.get(context);
+            if (list != null)
+            {
+               list.forEach((listener) -> {
+                  sendMessageToReceiver(message, listener);
+               });
+            }
+         }
       }
       if (message.getSender() != null)
       {
@@ -451,8 +569,6 @@ public final class Messenger
     */
    private static void sendMessageToReceiver(Message message, Object receiver)
    {
-      Class<?> theClass = receiver.getClass();
-
       Method method = getMethod(receiver.getClass(), message.getIdentifier(), message.getContent().getClass());
 
       if (method == null)
@@ -571,17 +687,19 @@ public final class Messenger
     * Register as listener to messages.
     *
     * @param object the object
+    * @param context the context
     * @return the number of messages ID registered
     */
-   private static int registerToMessages(Object object)
+   private static int registerToMessages(Object object, Object context)
    {
       Map<String, Map<Class<?>, Method>> map = getMethods(object.getClass());
-      map.forEach((id, meth) -> {
+      for (String id : map.keySet())
+      {
          if (id != "")
          {
-            addSubscription(id, object);
+            addSubscription(id, object, context);
          }
-      });
+      };
       return map.size();
    }
 
@@ -668,25 +786,33 @@ public final class Messenger
       }
       return methodmap;
    }
-
+   
    /**
-    * Send immediately a single message.
-    *
-    * @param message the message
+    * Start queue thread.
     */
-   private static void sendSingleMessage(Message message)
+   private static void startQueueThread()
    {
-      if (message == null)
-      {
-         return;
-      }
-      if (message.getReceiver() != null)
-      {
-         sendMessageToReceiver(message, message.getReceiver());
-      }
-      if (!message.isConfidential())
-      {
-         sendToWorld(message);
-      }
+      queueThread = new Thread(() -> {
+         while (true)
+         {
+            Message message;
+            do
+            {
+               message = queuelist.poll();
+               sendSingleMessage(message);
+            }
+            while (message != null);
+            try
+            {
+               Thread.sleep(interval);
+            }
+            catch (Exception e)
+            {
+               // really : don't care !
+            }
+         }
+      });
+      queueThread.setDaemon(true);
+      queueThread.start();
    }
 }
