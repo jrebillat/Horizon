@@ -47,6 +47,7 @@ It is up to any receiver, listener or subscriber to deal with the message. Nothi
 Here is a very basic example, with a source and a target :
 
 The code for the source is :
+
 ...java
 package net.alantea.horizon.demo;
 
@@ -70,6 +71,7 @@ public class DemoSource
 ...
 
 The target will be :
+
 ...java
 package net.alantea.horizon.demo;
 
@@ -92,6 +94,7 @@ public class DemoTarget
 ...
 
 and the whole session monitor by its main :
+
 ...java
 package net.alantea.horizon.demo;
 
@@ -113,6 +116,7 @@ public class DemoMain
 ...
 
 Calling the main method should output :
+
 ...
 The source NewBorn has been created.
 ...
