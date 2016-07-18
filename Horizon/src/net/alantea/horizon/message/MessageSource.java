@@ -38,26 +38,6 @@ public interface MessageSource
    }
    
    /**
-    * Adds an horizon listener.
-    *
-    * @param listener the listener
-    */
-   public default void addHorizonListener(Object listener)
-   {
-      Messenger.addHorizonListener(this, listener);
-   }
-   
-   /**
-    * Removes an horizon listener.
-    *
-    * @param listener the listener
-    */
-   public default void removeHorizonListener(Object listener)
-   {
-      Messenger.removeHorizonListener(this, listener);
-   }
-   
-   /**
     * Send a message. Please consider it carefully before overriding !
     *
     * @param receiver the receiver
@@ -79,5 +59,25 @@ public interface MessageSource
    public default void sendConfidentialMessage(Object receiver, String id, Object content)
    {
       Messenger.sendMessage(this, receiver, id, content, true);
+   }
+   
+   /**
+    * Adds an horizon listener.
+    *
+    * @param listener the listener
+    */
+   public default void addHorizonListener(Object listener)
+   {
+      Messenger.addHorizonListener(this, listener);
+   }
+   
+   /**
+    * Removes an horizon listener.
+    *
+    * @param listener the listener
+    */
+   public default void removeHorizonListener(Object listener)
+   {
+      Messenger.removeHorizonListener(this, listener);
    }
 }

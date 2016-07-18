@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 public @interface Listen
 {
    public String message() default "";
-   public String[] messages() default "";
+   public String[] messages() default {};
 }

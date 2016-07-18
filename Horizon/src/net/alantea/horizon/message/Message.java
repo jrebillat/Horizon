@@ -31,6 +31,7 @@ public class Message
     * @param receiver the receiver
     * @param id the identifier
     * @param content the content
+    * @param context the context
     * @param conf the confidentiality
     */
    public Message(Object sender, Object receiver, String id, Object content, Object context, boolean conf)
@@ -97,6 +98,7 @@ public class Message
    /**
     * Verify context coherency.
     *
+    * @param neededContext the needed context
     * @return the content
     */
    public boolean isInContext(Object neededContext)
@@ -124,6 +126,9 @@ public class Message
       this.confidential = confidential;
    }
 
+   /* (non-Javadoc)
+    * @see java.lang.Object#toString()
+    */
    @Override
    public String toString()
    {

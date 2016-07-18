@@ -23,11 +23,11 @@ public final class Messenger
     */
    public enum Mode
    {
-      /** A thread is used to deliver messages in the order they are generated. */
+      /** A thread is used to deliver messages in order they are generated. */
       THREADED,
-      /** A thread is used to thread messages (one thread per message). */
+      /** A thread is used to thread messages (one thread generating one thread per message). */
       HYPERTHREADED,
-      /** Messages are threaded (one thread per message) from the main thread. */
+      /** Messages are threaded in order (one thread per message) from the main thread. */
       CONCURRENT,
       /** Messages are processed in order from the main thread. */
       SYNCHRONOUS
@@ -44,6 +44,9 @@ public final class Messenger
 
    /** The Constant DEFAULTINTERVAL. */
    private static final int DEFAULTINTERVAL = 250;
+
+   /** The Constant MININTERVAL. */
+   private static final int MININTERVAL = 50;
 
    /** The Constant method header. */
    private static final String METHODHEADER = "on";
@@ -63,13 +66,13 @@ public final class Messenger
    /** The 'subscribers to all events' map. */
    private static List<Object> catchAllList = new ArrayList<>();
 
-   /** The subscribe map. */
+   /** The subscribe map. A map <Message identifier, Map<Context, List<subscribers>>> */
    private static Map<String, Map<Object, List<Object>>> subscribeMap = new HashMap<>();
 
-   /** The listener map. */
+   /** The listener map. A map < message source, List<subscribers>>*/
    private static Map<Object, List<Object>> listenermap = new ConcurrentHashMap<>();
 
-   /** The listener classes map. */
+   /** The listener classes map. A map < listening class class, map <Message identifier, map <waited content, target method>>>*/
    private static Map<Class<? extends Object>, Map<String, Map<Class<?>, Method>>> classesmap = new ConcurrentHashMap<>();
 
    /** The message sending mode. */
@@ -83,7 +86,7 @@ public final class Messenger
     */
    public static void setInterval(int value)
    {
-      if (value > 0)
+      if (value >= MININTERVAL)
       {
          interval = value;
       }
@@ -120,7 +123,7 @@ public final class Messenger
     * corresponding IDs messages.
     *
     * @param object the object
-    * @param object the object
+    * @param context the context
     * @return the number of messages ID registered
     */
    public static int register(Object object, Object context)
@@ -162,7 +165,7 @@ public final class Messenger
    }
 
    /**
-    * Send synchronous message.
+    * Send immediately a synchronous message.
     *
     * @param message the message
     */
@@ -175,7 +178,7 @@ public final class Messenger
    }
 
    /**
-    * Send synchronous message to the world.
+    * Send immediately a synchronous message to the world.
     *
     * @param sender the sender
     * @param id the id
@@ -187,12 +190,12 @@ public final class Messenger
    }
 
    /**
-    * Send synchronous message to the world.
+    * Send immediately a synchronous message to the world.
     *
     * @param sender the sender
     * @param id the id
-    * @param content the content
     * @param content the context
+    * @param context the context
     */
    public static final void sendSynchronousMessage(Object sender, String id, Object content, Object context)
    {
@@ -200,7 +203,7 @@ public final class Messenger
    }
 
    /**
-    * Send synchronous message to a receiver.
+    * Send immediately a synchronous message to a receiver.
     *
     * @param sender the sender
     * @param receiver the receiver
@@ -215,31 +218,19 @@ public final class Messenger
    }
 
    /**
-    * Send synchronous message to a receiver.
+    * Send immediately a synchronous message to a receiver.
     *
     * @param sender the sender
     * @param receiver the receiver
     * @param id the id
-    * @param content the content
     * @param content the context
+    * @param context the context
     * @param conf the confidentiality
     */
    public static final void sendSynchronousMessage(Object sender, Object receiver, String id, Object content,
          Object context, boolean conf)
    {
       sendSingleMessage(new Message(sender, receiver, id, content, context, conf));
-   }
-
-   /**
-    * Send message to the world.
-    *
-    * @param sender the sender
-    * @param id the id
-    * @param content the content
-    */
-   public static final void sendMessage(Object sender, String id, Object content)
-   {
-      sendMessage(sender, null, id, content, null, false);
    }
 
    /**
@@ -253,6 +244,17 @@ public final class Messenger
    public static final void sendConfidentialMessage(Object sender, Object receiver, String id, Object content)
    {
       sendMessage(sender, receiver, id, content, true);
+   }
+   /**
+    * Send message to the world.
+    *
+    * @param sender the sender
+    * @param id the id
+    * @param content the content
+    */
+   public static final void sendMessage(Object sender, String id, Object content)
+   {
+      sendMessage(sender, null, id, content, null, false);
    }
 
    /**
@@ -302,7 +304,7 @@ public final class Messenger
     *
     * @param message the message
     */
-   public static final void sendMessage(Message message)
+   public synchronized static final void sendMessage(Message message)
    {
       if ((message == null))
       {
@@ -490,7 +492,20 @@ public final class Messenger
     */
    public void monitorProperty(ReadOnlyProperty<?> property, String identifier)
    {
-      property.addListener((v, o, n) -> { sendMessage(property, identifier, n); });
+      monitorProperty(property, identifier, null);
+   }
+   
+   /**
+    *  Monitor a javafx property. Each change on property will trigger the given message type.
+    * The property is set as source and the new value is given as content.
+    *
+    * @param property to be monitored.
+    * @param identifier to use for sending messages.
+    * @param context the context
+    */
+   public void monitorProperty(ReadOnlyProperty<?> property, String identifier, Object context)
+   {
+      property.addListener((v, o, n) -> { sendMessage(property, identifier, context, n); });
    }
 
    /**
@@ -639,6 +654,14 @@ public final class Messenger
       return ret;
    }
 
+   /**
+    * Gets the method recursively.
+    *
+    * @param cl the cl
+    * @param id the id
+    * @param param the param
+    * @return the method recursively
+    */
    private static Method getMethodRecursively(Class<?> cl, String id, Class<?> param)
    {
       Map<String, Map<Class<?>, Method>> map = getMethods(cl);
@@ -706,7 +729,8 @@ public final class Messenger
    /**
     * Parses the methods.
     *
-    * @param listener the listener
+    * @param theClass the the class
+    * @return the methods
     */
    private static final Map<String, Map<Class<?>, Method>> getMethods(Class<?> theClass)
    {
@@ -760,31 +784,40 @@ public final class Messenger
                Listen annotation = method.getAnnotation(Listen.class);
                if (!DEFAULTID.equals(annotation.message()))
                {
-                  method.setAccessible(true);
-                  Map<Class<?>, Method> meths = methodmap.get(annotation.message());
-                  if (meths == null)
-                  {
-                     meths = new HashMap<>();
-                  }
-                  meths.put(method.getParameterTypes()[0], method);
-                  methodmap.put(annotation.message(), meths);
+                  registerListeningMethod(annotation.message(), method, methodmap);
+               }
+               for( String id : annotation.messages())
+               {
+                  registerListeningMethod(id, method, methodmap);
                }
             }
             else if ((name.startsWith(METHODHEADER)) && (name.endsWith(METHODFOOTER)))
             {
                   String id = name.substring(METHODHEADER.length(), name.length() - METHODFOOTER.length());
-                  method.setAccessible(true);
-                  Map<Class<?>, Method> meths = methodmap.get(id);
-                  if (meths == null)
-                  {
-                     meths = new HashMap<>();
-                  }
-                  meths.put(method.getParameterTypes()[0], method);
-                  methodmap.put(id, meths);
+                  registerListeningMethod(id, method, methodmap);
             }
          }
       }
       return methodmap;
+   }
+   
+   /**
+    * Register listening method.
+    *
+    * @param key the key
+    * @param method the method
+    * @param methodmap the methodmap
+    */
+   private static void registerListeningMethod(String key, Method method, Map<String, Map<Class<?>, Method>> methodmap)
+   {
+      method.setAccessible(true);
+      Map<Class<?>, Method> meths = methodmap.get(key);
+      if (meths == null)
+      {
+         meths = new HashMap<>();
+      }
+      meths.put(method.getParameterTypes()[0], method);
+      methodmap.put(key, meths);
    }
    
    /**
