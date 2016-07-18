@@ -1,12 +1,12 @@
 # Horizon
-**Event message driven tool for applications**
+##Event message driven tool for applications
 The goal of Horizon is to offer tools for exchanging messages between Java objects
 
 ## Why using messages ?
 Exchanging messages between objects allows the application to avoid setting connections between the corresponding elements. It loosen the links between classes, instances and packages. This is good for application design. It also simplify any further changes in design or implementation, as senders and receivers have not to know each other to exchange messages.
 
 ### Message use example
-let us take as example a GUI, with a button in a panel. When the user press the button in the panel, something must append (a data change) in the model.
+Let us take as example a GUI, with a button in a panel. When the user press the button in the panel, something must append (a data change) in the model.
 In a classic design, the button must be linked with the model, knowing the data to be changed. An action listener will then  allow the user pressing the button to change the value.
 
 Using messages, we will just define a specific message identifier, (say : "ChangeMyDataValue") and code a listener for the button to send the message when pressed. On the other end, we will code a listener in the model, that will change the value when receiving a message with the correct identifier. The button do not know the model, neither do the model know the button.
@@ -42,3 +42,77 @@ Note that there is a special method definition that will be called if there is n
 Third : To receive world-wide sent messages, one of the methods "Messenger.register()" must be called on the first object creation (it is not harmfull to recall it any number of time).
 
 It is up to any receiver, listener or subscriber to deal with the message. Nothing is awaited in return.
+
+# Want an example ?
+Here is a very basic example, with a source and a target :
+
+The code for the source is :
+...java
+package net.alantea.horizon.demo;
+
+import net.alantea.horizon.message.Messenger;
+
+public class DemoSource
+{
+   private String theName;
+   
+   public DemoSource(String name)
+   {
+      theName = name;
+      Messenger.sendMessage(null, "IveBeenCreated", this);
+   }
+
+   public String getName()
+   {
+      return theName;
+   }
+}
+...
+
+The target will be :
+...java
+package net.alantea.horizon.demo;
+
+import net.alantea.horizon.message.Listen;
+import net.alantea.horizon.message.Messenger;
+
+public class DemoTarget
+{
+   public DemoTarget()
+   {
+      Messenger.register(this);
+   }
+   
+   @Listen(message="IveBeenCreated")
+   private void onSourceCreation(DemoSource source)
+   {
+      System.out.println("The source " + source.getName() + " has been created.");
+   }
+}
+...
+
+and the whole session monitor by its main :
+...java
+package net.alantea.horizon.demo;
+
+import net.alantea.horizon.message.Messenger;
+import net.alantea.horizon.message.Messenger.Mode;
+
+public class DemoMain
+{
+   public static void main(String[] args)
+   {
+      Messenger.setMode(Mode.SYNCHRONOUS);
+      DemoTarget target = new DemoTarget();
+      Messenger.register(target);
+
+      DemoSource source = new DemoSource("NewBorn");
+   }
+
+}
+...
+
+Calling the main method should output :
+...
+The source NewBorn has been created.
+...
