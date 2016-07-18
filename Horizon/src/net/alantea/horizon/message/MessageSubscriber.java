@@ -17,7 +17,7 @@ public interface MessageSubscriber
     */
    public default void subscribe(String id)
    {
-      Messenger.addSubscription(id, this, Messenger.DEFAULTCONTEXT);
+      Messenger.addSubscription(Messenger.DEFAULTCONTEXT, id, this);
    }
    
    /**
@@ -28,7 +28,7 @@ public interface MessageSubscriber
     */
    public default void subscribe(String id, Object context)
    {
-      Messenger.addSubscription(id, this, context);
+      Messenger.addSubscription(context, id, this);
    }
    
    /**
@@ -49,6 +49,6 @@ public interface MessageSubscriber
     */
    public default void unsubscribe(String id, Object context)
    {
-      Messenger.removeSubscription(id, this, context);
+      Messenger.removeSubscription(context, id, this);
    }
 }

@@ -13,7 +13,7 @@ public interface MessageSource
     */
    public default void sendMessage(String name)
    {
-      Messenger.sendMessage(new Message(this, null, name, "", null, false));
+      Messenger.sendMessage(new Message(null, this, null, name, "", false));
    }
    
    /**
@@ -24,7 +24,7 @@ public interface MessageSource
     */
    public default void sendMessage(String name, Object parameters)
    {
-      Messenger.sendMessage(new Message(this, null, name, parameters, null, false));
+      Messenger.sendMessage(new Message(null, this, null, name, parameters, false));
    }
    
    /**

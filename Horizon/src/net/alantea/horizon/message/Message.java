@@ -27,14 +27,14 @@ public class Message
    /**
     * Instantiates a new message.
     *
+    * @param context the context
     * @param sender the sender
     * @param receiver the receiver
     * @param id the identifier
     * @param content the content
-    * @param context the context
     * @param conf the confidentiality
     */
-   public Message(Object sender, Object receiver, String id, Object content, Object context, boolean conf)
+   public Message(Object context, Object sender, Object receiver, String id, Object content, boolean conf)
    {
       super();
       this.sender = sender;
