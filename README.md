@@ -48,7 +48,7 @@ Here is a very basic example, with a source and a target :
 
 The code for the source is :
 
-...java
+```java
 package net.alantea.horizon.demo;
 
 import net.alantea.horizon.message.Messenger;
@@ -68,11 +68,11 @@ public class DemoSource
       return theName;
    }
 }
-...
+```
 
 The target will be :
 
-...java
+```java
 package net.alantea.horizon.demo;
 
 import net.alantea.horizon.message.Listen;
@@ -91,11 +91,11 @@ public class DemoTarget
       System.out.println("The source " + source.getName() + " has been created.");
    }
 }
-...
+```
 
 and the whole session monitor by its main :
 
-...java
+```java
 package net.alantea.horizon.demo;
 
 import net.alantea.horizon.message.Messenger;
@@ -113,10 +113,10 @@ public class DemoMain
    }
 
 }
-...
+```
 
 Calling the main method should output :
 
-...
+```
 The source NewBorn has been created.
-...
+```
