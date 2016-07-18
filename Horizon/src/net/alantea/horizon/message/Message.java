@@ -40,7 +40,7 @@ public class Message
       this.sender = sender;
       this.receiver = receiver;
       this.id = id;
-      this.content = content;
+      this.content = (content == null) ? this : content;
       this.context = context;
       this.confidential = conf;
    }

@@ -113,7 +113,7 @@ public final class Messenger
     */
    public static int register(Object object)
    {
-      return register(object, ALLCONTEXTS);
+      return register(object, DEFAULTCONTEXT);
    }
 
    /**
@@ -703,6 +703,11 @@ public final class Messenger
             }
          }
       }
+      
+      if ((ret == null) && (!param.equals(Message.class)))
+      {
+         ret = getMethodRecursively(cl, id, Message.class);
+      }
       return ret;
    }
 
@@ -766,9 +771,9 @@ public final class Messenger
       {
          for (Class<?> cl1 : cl.getInterfaces())
          {
-            methodmap.putAll(getSubMethodMap(cl1));
+            methodmap.putAll(copyMethodsMap(cl1));
          }
-         methodmap.putAll(getSubMethodMap(cl.getSuperclass()));
+         methodmap.putAll(copyMethodsMap(cl.getSuperclass()));
       }
 
       // Get methods declared in class itself
@@ -797,6 +802,29 @@ public final class Messenger
                   registerListeningMethod(id, method, methodmap);
             }
          }
+      }
+      return methodmap;
+   }
+   
+   private static Map<String, Map<Class<?>, Method>> copyMethodsMap(Class<?> subclass)
+   {
+      Map<String, Map<Class<?>, Method>> methodmap = new HashMap<>();
+      
+      // Warning : copy content, do not just link to it.
+      Map<String, Map<Class<?>, Method>> supermap = getSubMethodMap(subclass);
+      for(String key : supermap.keySet())
+      {
+         Map<Class<?>, Method> submap = supermap.get(key);
+         Map<Class<?>, Method> meths = methodmap.get(key);
+         if (meths == null)
+         {
+            meths = new HashMap<>();
+         }
+         for (Class<?> parmClass : submap.keySet())
+         {
+            meths.put(parmClass, submap.get(parmClass));
+         }
+         methodmap.put(key, meths);
       }
       return methodmap;
    }
