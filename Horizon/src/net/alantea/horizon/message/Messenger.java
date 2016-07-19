@@ -490,7 +490,7 @@ public final class Messenger
     * @param property to be monitored.
     * @param identifier to use for sending messages.
     */
-   public void monitorProperty(ReadOnlyProperty<?> property, String identifier)
+   public static void monitorProperty(ReadOnlyProperty<?> property, String identifier)
    {
       monitorProperty(DEFAULTCONTEXT, property, identifier);
    }
@@ -503,7 +503,7 @@ public final class Messenger
     * @param property to be monitored.
     * @param identifier to use for sending messages.
     */
-   public void monitorProperty(Object context, ReadOnlyProperty<?> property, String identifier)
+   public static void monitorProperty(Object context, ReadOnlyProperty<?> property, String identifier)
    {
       property.addListener((v, o, n) -> { sendMessage(context, property, identifier, n); });
    }
@@ -586,11 +586,6 @@ public final class Messenger
    {
       Method method = getMethod(receiver.getClass(), message.getIdentifier(), message.getContent().getClass());
 
-      if (method == null)
-      {
-         method = getMethod(receiver.getClass(), message.getIdentifier(), Message.class);
-      }
-
       if (method != null)
       {
          if (mode == Mode.CONCURRENT || mode == Mode.HYPERTHREADED)
@@ -643,15 +638,7 @@ public final class Messenger
     */
    private static Method getMethod(Class<?> cl, String id, Class<?> param)
    {
-      Method ret = getMethodRecursively(cl, id, param);
-
-      // take default
-      if (ret == null)
-      {
-         ret = getMethodRecursively(cl, DEFAULTID, param);
-      }
-      
-      return ret;
+      return getMethodRecursively(cl, id, param);
    }
 
    /**
