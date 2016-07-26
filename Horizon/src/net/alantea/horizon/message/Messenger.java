@@ -150,6 +150,41 @@ public final class Messenger
          catchAllList.add(object);
       }
    }
+   
+   /**
+    * Unregister.
+    *
+    * @param param the param
+    */
+   public static void unregister(Object param)
+   {
+      unregister(DEFAULTID, param);
+   }
+
+   /**
+    * Unregister.
+    *
+    * @param context the context
+    * @param param the param
+    */
+   public static void unregister(Object context, Object param)
+   {
+      if (param == null)
+      {
+         return;
+      }
+      Object realContext = (context == null) ? DEFAULTCONTEXT : context;
+      
+      for (String id : subscribeMap.keySet())
+      {
+         Map<Object, List<Object>> contextMap = subscribeMap.get(id);
+         List<Object> list = contextMap.get(realContext);
+         if (list.contains(param))
+         {
+            list.remove(param);
+         }
+      }
+   }
 
    /**
     * Unregister the object from getting all future messages.
@@ -666,10 +701,17 @@ public final class Messenger
 
          // search for parameter superclasses
          Class<?> superparam = param.getSuperclass();
-         while ((ret == null) && (superparam != null) && ((!superparam.equals(Object.class))))
+         while ((ret == null) && (superparam != null))
          {
-            ret = getMethodRecursively(cl, id, superparam);
-            superparam = superparam.getSuperclass();
+            ret = meths.get(superparam);
+            if (!superparam.equals(Object.class))
+            {
+               superparam = superparam.getSuperclass();
+            }
+            else
+            {
+               superparam = null;
+            }
          }
 
          // search for parameter interfaces (but just one level deep,
