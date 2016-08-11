@@ -18,7 +18,7 @@ public class MethodsManager
    private static final String METHODFOOTER = "Message";
 
    /** The "catch all" message constant. */
-   protected static final String DEFAULTID = "__Default 1d__";
+   protected static final String DEFAULTID = "";
 
    /** The listener classes map. A map < listening class class, map <Message identifier, map <waited content, target method>>>*/
    private static Map<Class<? extends Object>, Map<String, Map<Class<?>, Method>>> classesmap = new ConcurrentHashMap<>();
