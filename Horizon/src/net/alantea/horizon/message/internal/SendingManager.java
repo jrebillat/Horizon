@@ -94,9 +94,11 @@ public class SendingManager extends RegisterManager
             List<Object> list = contextMap.get(context);
             if (list != null)
             {
-               list.forEach((listener) -> {
+               Object[] objs = list.toArray();
+               for(Object listener : objs) 
+               {
                   sendMessageToReceiver(message, listener);
-               });
+               }
             }
          }
       }

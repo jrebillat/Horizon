@@ -98,7 +98,7 @@ public class RegisterManager extends SubscriptionManager
       {
          Map<Object, List<Object>> contextMap = getSubscribeMap().get(id);
          List<Object> list = contextMap.get(realContext);
-         if (list.contains(param))
+         if ((list != null) && (list.contains(param)))
          {
             list.remove(param);
          }
