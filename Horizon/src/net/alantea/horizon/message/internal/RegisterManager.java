@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class RegisterManager extends SubscriptionManager
 {
+   private static final String ALL_IDENTIFIERS = null;
 
    /** The 'subscribers to all events' map. */
    private static List<Object> catchAllList = new ArrayList<>();
@@ -51,7 +52,27 @@ public class RegisterManager extends SubscriptionManager
       {
          return 0;
       }
-      return registerToMessages(context, object);
+      return registerToMessages(context, object, ALL_IDENTIFIERS);
+   }
+
+   /**
+    * Register to specific messages that we are waiting for in the context. This method search for
+    * all @Listen(message="ID") or &#64;Listen(messages={"ID1", "ID2"...}) annotations. It also look
+    * to all "onXXXXMessage" methods using XXXX as ID. Then it subscribes the object to all
+    * corresponding IDs messages.
+    *
+    * @param context the context
+    * @param object the object
+    * @param identifier the identifier or null for all
+    * @return the number of messages ID registered
+    */
+   public static final int register(Object context, Object object, String identifier)
+   {
+      if (object == null)
+      {
+         return 0;
+      }
+      return registerToMessages(context, object, identifier);
    }
 
    /**
@@ -123,14 +144,15 @@ public class RegisterManager extends SubscriptionManager
     *
     * @param object the object
     * @param context the context
+    * @param identifier the identifier or null for all
     * @return the number of messages ID registered
     */
-   private static int registerToMessages(Object context, Object object)
+   private static int registerToMessages(Object context, Object object, String identifier)
    {
       Map<String, Map<Class<?>, Method>> map = getMethods(object.getClass());
       for (String id : map.keySet())
       {
-         if (id != "")
+         if ((id != "") && ((identifier == null) || (id.equals(identifier))))
          {
             addSubscription(context, id, object);
          }
