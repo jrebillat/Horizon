@@ -27,6 +27,20 @@ public class Message
    /**
     * Instantiates a new message.
     *
+    * @param sender the sender
+    * @param receiver the receiver
+    * @param id the identifier
+    * @param content the content
+    * @param conf the confidentiality
+    */
+   public Message(Object sender, Object receiver, String id, Object content, boolean conf)
+   {
+      this(Messenger.DEFAULTCONTEXT, sender, receiver, id, content, conf);
+   }
+   
+   /**
+    * Instantiates a new message.
+    *
     * @param context the context
     * @param sender the sender
     * @param receiver the receiver
