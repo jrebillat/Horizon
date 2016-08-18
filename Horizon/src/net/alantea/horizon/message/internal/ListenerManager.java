@@ -5,6 +5,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+
+/**
+ * The Class ListenerManager. It contains the methods to manage the listening process for sources.
+ */
 public class ListenerManager extends MethodsManager
 {
 
@@ -14,29 +18,36 @@ public class ListenerManager extends MethodsManager
    /**
     * Adds an horizon listener to a specific source.
     *
-    * @param object the horizon source
+    * @param source the horizon source
     * @param listener the listener
     * @return true, if successful
     */
-   public static final boolean addHorizonListener(Object object, Object listener)
+   public static final boolean addHorizonListener(Object source, Object listener)
    {
-      if ((object == null) || (listener == null))
+      if ((source == null) || (listener == null))
       {
          return false;
       }
 
+      // the map shall not be modified during addition.
       synchronized (listenermap)
       {
-         List<Object> listeners = listenermap.get(object);
+         // Get already registered listeners.
+         List<Object> listeners = listenermap.get(source);
 
+         // First time : the list do not exist.
          if (listeners == null)
          {
+            // create empty list and add it to map.
             listeners = new CopyOnWriteArrayList<>();
-            listenermap.put(object, listeners);
+            listenermap.put(source, listeners);
          }
+         
          if (!listeners.contains(listener))
          {
+            //Add listener if it is not already registered
             listeners.add(listener);
+            // prepare list of methods for later use
             getMethods(listener.getClass());
          }
       }
@@ -44,22 +55,33 @@ public class ListenerManager extends MethodsManager
    }
 
    /**
-    * Removes a horizon listener from a specific source.
+    * Removes an horizon listener from a specific source.
     *
-    * @param object the horizon source
+    * @param source the horizon source
     * @param listener the listener
     * @return true, if successful
     */
-   public static final boolean removeHorizonListener(Object object, Object listener)
+   public static final boolean removeHorizonListener(Object source, Object listener)
    {
+      // Silly case
+      if (source == null)
+      {
+         return false;
+      }
+      
+      // Don't modify while removing
       synchronized (listenermap)
       {
-         List<Object> listeners = listenermap.get(object);
+         // Get registered listeners.
+         List<Object> listeners = listenermap.get(source);
 
+         // First time : the list do not exist.
          if (listeners != null)
          {
+            // if listener is registered
             if (listeners.contains(listener))
             {
+               // remove from list
                listeners.remove(listener);
                return true;
             }
@@ -74,19 +96,23 @@ public class ListenerManager extends MethodsManager
     * @param object the horizon source
     * @return true, if successful
     */
-   public static final boolean removeAllHorizonListeners(Object object)
+   public static final boolean removeAllHorizonListeners(Object source)
    {
-      if (object == null)
+      // Silly case
+      if (source == null)
       {
          return false;
       }
-      
+
+      // Don't modify while removing
       synchronized (listenermap)
       {
-         List<Object> listeners = listenermap.get(object);
+         List<Object> listeners = listenermap.get(source);
 
+         // First time : the list do not exist.
          if (listeners != null)
          {
+            // clear list
             listeners.clear();
             return true;
          }
@@ -95,9 +121,9 @@ public class ListenerManager extends MethodsManager
    }
 
    /**
-    * Gets the listenermap.
+    * Gets the listener map.
     *
-    * @return the listenermap
+    * @return the listener map
     */
    protected static final Map<Object, List<Object>> getListenermap()
    {

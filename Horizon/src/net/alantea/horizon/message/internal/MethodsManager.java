@@ -8,6 +8,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.alantea.horizon.message.Listen;
 import net.alantea.horizon.message.Message;
 
+/**
+ * The Class MethodsManager. This class contains the elements to manage the methods, their parameters and their access, in an
+ * Horizon point of view.
+ */
 public class MethodsManager
 {
 
@@ -26,31 +30,40 @@ public class MethodsManager
    /**
     * Gets the method recursively.
     *
-    * @param cl the cl
-    * @param id the id
-    * @param param the param
+    * @param managedClass the managed class
+    * @param identifier the identifier
+    * @param parameter the parameter
     * @return the method recursively
     */
-   private static Method getMethodRecursively(Class<?> cl, String id, Class<?> param)
+   private static Method getMethodRecursively(Class<?> managedClass, String identifier, Class<?> parameter)
    {
-      Map<String, Map<Class<?>, Method>> map = getMethods(cl);
-      Map<Class<?>, Method> meths = map.get(id);
-      if ((meths == null) && (!DEFAULTID.equals(id)))
+      // get the map for methods in class.
+      Map<String, Map<Class<?>, Method>> map = getMethods(managedClass);
+      
+      // search for methods managing the identifier (may have several depending on parameter type)
+      Map<Class<?>, Method> meths = map.get(identifier);
+      
+      // If nothing is found, analyse more the class.
+      if ((meths == null) && (!DEFAULTID.equals(identifier)))
       {
-         return getMethodRecursively(cl, DEFAULTID, param);
+         return getMethodRecursively(managedClass, DEFAULTID, parameter);
       }
 
+      // Analyze parameter type for each method, to get the best match.
       Method ret = null;
       if (meths != null)
       {
+         // Get method with exactly the given parameter type.
+         ret = meths.get(parameter);
 
-         ret = meths.get(param);
-
-         // search for parameter superclasses
-         Class<?> superparam = param.getSuperclass();
+         // Set current class as superclass.
+         Class<?> superparam = parameter.getSuperclass();
+         // If not already found, we have to search for parameter superclass of current class
          while ((ret == null) && (superparam != null))
          {
+            // Get method with superclass parameter type.
             ret = meths.get(superparam);
+            // prepare superclass for superclass, for next loop, except for Object.
             if (!superparam.equals(Object.class))
             {
                superparam = superparam.getSuperclass();
@@ -61,18 +74,21 @@ public class MethodsManager
             }
          }
 
-         // search for parameter interfaces (but just one level deep,
-         // don't get interfaces extended by interfaces)
+         // search for parameter interfaces for parameter class and all super classes
+         // TODO (but just one level deep, don't get interfaces extended by interfaces)
          if ((ret == null))
          {
-            superparam = param;
+            // rewind to parameter
+            superparam = parameter;
             while ((ret == null) && (superparam != null) && ((!superparam.equals(Object.class))))
             {
+               // get interfaces implemented by the curent class
                Class<?>[] itfs = superparam.getInterfaces();
                int i = 0;
                while ((ret == null) && (i < itfs.length) && ((!itfs[i].equals(Object.class))))
                {
-                  ret = getMethodRecursively(cl, id, itfs[i]);
+                  // TODO why not use 'ret = meths.get(itfs[i]);' ???
+                  ret = getMethodRecursively(managedClass, identifier, itfs[i]);
                   i++;
                }
                superparam = superparam.getSuperclass();
@@ -80,55 +96,62 @@ public class MethodsManager
          }
       }
       
-      if ((ret == null) && (!param.equals(Message.class)))
+      // If nothing has been found so far, search for 'default' method for identifier, the one with a Message as parameter.
+      if ((ret == null) && (!parameter.equals(Message.class)))
       {
-         ret = getMethodRecursively(cl, id, Message.class);
+         ret = getMethodRecursively(managedClass, identifier, Message.class);
       }
       return ret;
    }
 
    /**
-    * Gets the method.
+    * Gets the method listening to identifier with the correct parameter.
     *
-    * @param cl the cl class to parse
-    * @param id the id identifier searched for
-    * @param param the parameter to search for
+    * @param managedClass the managed class to parse
+    * @param identifier the identifier searched for
+    * @param parameter the parameter to search for
     * @return the method found or null
     */
-   protected static final Method getMethod(Class<?> cl, String id, Class<?> param)
+   protected static final Method getMethod(Class<?> managedClass, String identifier, Class<?> parameter)
    {
-      return getMethodRecursively(cl, id, param);
+      if ((managedClass == null) || (identifier == null))
+      {
+         return null;
+      }
+      return getMethodRecursively(managedClass, identifier, parameter);
    }
 
    /**
-    * Parses the methods.
+    * Parses all methods for a class, to organize them and add them in the global class map.
     *
-    * @param theClass the the class
+    * @param managedClass the class
     * @return the methods
     */
-   protected static final Map<String, Map<Class<?>, Method>> getMethods(Class<?> theClass)
+   protected static final Map<String, Map<Class<?>, Method>> getMethods(Class<?> managedClass)
    {
-      Map<String, Map<Class<?>, Method>> methodmap = getSubMethodMap(theClass);
-      classesmap.put(theClass, methodmap);
+      // get methods map for class
+      Map<String, Map<Class<?>, Method>> methodmap = getSubMethodMap(managedClass);
+      // Add them to global class map
+      classesmap.put(managedClass, methodmap);
       return methodmap;
    }
 
    /**
-    * Gets the sub method map.
+    * Gets the method map for a class.
     *
-    * @param cl the cl
+    * @param managedClass the class to map
     * @return the sub method map
     */
-   private static Map<String, Map<Class<?>, Method>> getSubMethodMap(Class<?> cl)
+   private static Map<String, Map<Class<?>, Method>> getSubMethodMap(Class<?> managedClass)
    {
       // Test silly call
-      if (cl == null)
+      if (managedClass == null)
       {
          return new ConcurrentHashMap<>();
       }
 
       // Test if we already have done the work.
-      Map<String, Map<Class<?>, Method>> methodmap = classesmap.get(cl);
+      Map<String, Map<Class<?>, Method>> methodmap = classesmap.get(managedClass);
       if (methodmap != null)
       {
          return methodmap;
@@ -136,30 +159,34 @@ public class MethodsManager
 
       // Search for compatible methods in interfaces (for default methods) and superclass.
       methodmap = new ConcurrentHashMap<>();
-      if (!cl.equals(Object.class))
+      if (!managedClass.equals(Object.class))
       {
-         for (Class<?> cl1 : cl.getInterfaces())
+         for (Class<?> class1 : managedClass.getInterfaces())
          {
-            methodmap.putAll(copyMethodsMap(cl1));
+            methodmap.putAll(copyMethodsMap(class1));
          }
-         methodmap.putAll(copyMethodsMap(cl.getSuperclass()));
+         methodmap.putAll(copyMethodsMap(managedClass.getSuperclass()));
       }
 
       // Get methods declared in class itself
-      Method[] methods = cl.getDeclaredMethods();
+      Method[] methods = managedClass.getDeclaredMethods();
       for (Method method : methods)
       {
+         // Usable listening methods have only one parameter
          if (method.getParameterCount() == 1)
          {
             String name = method.getName();
-            // Method with @Listen
+            // If the method is annoted with @Listen and analyse Listen annotation
             if (method.isAnnotationPresent(Listen.class))
             {
                Listen annotation = method.getAnnotation(Listen.class);
+               // Only search if not the default identifier in message field
                if (!DEFAULTID.equals(annotation.message()))
                {
+                  // Yep, that's one ! Register in map.
                   registerListeningMethod(annotation.message(), method, methodmap);
                }
+               // Search for all identifiers listed in messages
                for( String id : annotation.messages())
                {
                   registerListeningMethod(id, method, methodmap);
@@ -167,14 +194,21 @@ public class MethodsManager
             }
             else if ((name.startsWith(METHODHEADER)) && (name.endsWith(METHODFOOTER)))
             {
-                  String id = name.substring(METHODHEADER.length(), name.length() - METHODFOOTER.length());
-                  registerListeningMethod(id, method, methodmap);
+               // Analyse method name to guess the identifier name.
+               String id = name.substring(METHODHEADER.length(), name.length() - METHODFOOTER.length());
+               registerListeningMethod(id, method, methodmap);
             }
          }
       }
       return methodmap;
    }
    
+   /**
+    * Deep copy for methods map to avoid messing with already created maps (for subclasses, interfaces... ).
+    *
+    * @param subclass the sub class to copy method map from
+    * @return the map
+    */
    private static Map<String, Map<Class<?>, Method>> copyMethodsMap(Class<?> subclass)
    {
       Map<String, Map<Class<?>, Method>> methodmap = new HashMap<>();

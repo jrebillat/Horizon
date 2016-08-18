@@ -8,10 +8,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.alantea.horizon.message.Message;
 
+/**
+ * The Class SendingManager. Deals with management of sending messages
+ */
 public class SendingManager extends RegisterManager
 {
    /**
-    * The Enum Mode.
+    * The Mode enum. Select mode of transmission. By default, the mode is preset (see mode field).
     */
    public enum Mode
    {
@@ -29,7 +32,7 @@ public class SendingManager extends RegisterManager
    private static final int DEFAULTINTERVAL = 250;
 
    /** The Constant MININTERVAL. */
-   private static final int MININTERVAL = 50;
+   public static final int MININTERVAL = 50;
 
    /** The queued messages list. */
    private static ConcurrentLinkedQueue<Message> queuelist = new ConcurrentLinkedQueue<>();
@@ -44,12 +47,13 @@ public class SendingManager extends RegisterManager
    private static Mode mode = Mode.HYPERTHREADED;
 
    /**
-    * Sets the interval between message list polling.
+    * Sets the interval between message list polling. This value must be positive and greater than MININTERVAL.
     *
     * @param value the new interval
     */
    public static final void setInterval(int value)
    {
+      // Don't loop too fast
       if (value >= MININTERVAL)
       {
          interval = value;
@@ -57,59 +61,78 @@ public class SendingManager extends RegisterManager
    }
 
    /**
-    * Sets the threading mode.
+    * Sets the threading mode. Note that this will not stop the queue thread, but it may not receive messages to send.
     *
     * @param newMode the new mode
     */
    public static final void setMode(Mode newMode)
    {
+      // change mode
       mode = newMode;
    }
 
    /**
-    * Send message to all subscribers.
+    * Send a message to all subscribers.
     *
     * @param message the message
     */
    private static void sendToWorld(Message message)
    {
+      // Get context
       Object context = (message.getContext() == null) ? DEFAULTCONTEXT : message.getContext();
+      
+      // get subscription map for context
       Map<Object, List<Object>> contextMap = getSubscribeMap().get(message.getIdentifier());
+      
+      // if there is something to do
       if (contextMap != null)
       {
+         // Special case : do it for all contexts
          if (context.equals(ALLCONTEXTS))
          {
+            // Loop on contexts
             contextMap.keySet().forEach((ctx) -> {
+               // get listener list
                List<Object> list = contextMap.get(ctx);
                if (list != null)
                {
-                  list.forEach((listener) -> {
-                     sendMessageToReceiver(message, listener);
+                  // Loop on subscribers
+                  list.forEach((subscriber) -> {
+                     // send message
+                     sendMessageToReceiver(message, subscriber);
                   });
                }
             }); 
          }
          else
          {
+            // get listener list
             List<Object> list = contextMap.get(context);
             if (list != null)
             {
                Object[] objs = list.toArray();
-               for(Object listener : objs) 
+               // Loop on subscribers
+               for(Object subscriber : objs) 
                {
-                  sendMessageToReceiver(message, listener);
+                  // send message
+                  sendMessageToReceiver(message, subscriber);
                }
             }
          }
       }
+      
       if (message.getSender() != null)
       {
+         // Send message to objects listening to this source
          List<Object> listeners = getListenermap().get(message.getSender());
          if (listeners != null)
          {
+            // loop on listeners
             listeners.forEach((listener) -> sendMessageToReceiver(message, listener));
          }
       }
+      
+      // Loop on objects wanting to catch all messages
       getCatchAllList().forEach((listener) -> {
          sendMessageToReceiver(message, listener);
       });
@@ -123,17 +146,20 @@ public class SendingManager extends RegisterManager
     */
    private static void sendMessageToReceiver(Message message, Object receiver)
    {
+      // get method to use
       Method method = getMethod(receiver.getClass(), message.getIdentifier(), message.getContent().getClass());
 
       if (method != null)
       {
          if (mode == Mode.CONCURRENT || mode == Mode.HYPERTHREADED)
          {
+            // Create a thread to launch the call
             final Method theMethod = method;
             new Thread(() -> sendToMethod(theMethod, receiver, message)).start();
          }
          else
          {
+            // directly send
             sendToMethod(method, receiver, message);
          }
       }
@@ -150,11 +176,15 @@ public class SendingManager extends RegisterManager
    {
       try
       {
+         // Ensure to be able to call method
          method.setAccessible(true);
+         
+         // Case : the method has a Message as argument
          if (method.getParameterTypes()[0].isAssignableFrom(Message.class))
          {
             method.invoke(receiver, message);
          }
+         // Case : the method waits for a specific object corresponding to what is sent 
          else if (method.getParameterTypes()[0].isAssignableFrom(message.getContent().getClass()))
          {
             method.invoke(receiver, message.getContent());
@@ -176,12 +206,17 @@ public class SendingManager extends RegisterManager
          while (true)
          {
             Message message;
+            // Loop on messages in the queue
             do
             {
+               // get next message in queue
                message = queuelist.poll();
+               // send it
                sendSingleMessage(message);
             }
             while (message != null);
+            
+            // sleep a while
             try
             {
                Thread.sleep(interval);
@@ -192,6 +227,8 @@ public class SendingManager extends RegisterManager
             }
          }
       });
+      
+      // the queue is a daemon
       queueThread.setDaemon(true);
       queueThread.start();
    }
@@ -203,14 +240,20 @@ public class SendingManager extends RegisterManager
     */
    protected static void sendSingleMessage(Message message)
    {
+      // Silly call
       if (message == null)
       {
          return;
       }
+      
+      // Verify receiver
       if (message.getReceiver() != null)
       {
+         // send
          sendMessageToReceiver(message, message.getReceiver());
       }
+      
+      // Non confidential messages are also sent to the world
       if (!message.isConfidential())
       {
          sendToWorld(message);
@@ -218,12 +261,13 @@ public class SendingManager extends RegisterManager
    }
 
    /**
-    * Send message.
+    * Really send a message.
     *
     * @param message the message
     */
    protected synchronized static final void internalSendMessage(Message message)
    {
+      // Silly call
       if ((message == null))
       {
          return;
@@ -238,6 +282,7 @@ public class SendingManager extends RegisterManager
             startQueueThread();
          }
 
+         // add mesage to queue
          synchronized (queuelist)
          {
             queuelist.add(message);
@@ -245,6 +290,7 @@ public class SendingManager extends RegisterManager
       }
       else
       {
+         // Just send
          sendSingleMessage(message);
       }
    }
