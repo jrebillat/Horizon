@@ -121,7 +121,7 @@ public class SubscriptionManager extends ListenerManager
       List<Object> list = contextMap.get(realContext);
       
       // Verify subscription
-      if ((list != null) && (list.contains(subscriber)))
+      if (list.contains(subscriber))
       {
          // remove it
          list.remove(subscriber);
