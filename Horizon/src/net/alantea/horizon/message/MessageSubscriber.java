@@ -17,7 +17,7 @@ public interface MessageSubscriber
     */
    public default void subscribe(String id)
    {
-      Messenger.addSubscription(Messenger.DEFAULTCONTEXT, id, this);
+      Messenger.register(Messenger.DEFAULTCONTEXT, this, id);
    }
    
    /**

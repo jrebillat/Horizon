@@ -1,12 +1,11 @@
 package net.alantea.horizon.message;
 
-import javafx.beans.property.ReadOnlyProperty;
-import net.alantea.horizon.message.internal.SendingManager;
+import net.alantea.horizon.message.internal.PropertyMonitor;
 
 /**
  * The Class Messenger.
  */
-public final class Messenger extends SendingManager
+public final class Messenger extends PropertyMonitor
 {
 
 
@@ -153,28 +152,5 @@ public final class Messenger extends SendingManager
    public synchronized static final void sendMessage(Message message)
    {
       internalSendMessage(message);
-   }
-   
-   /** Monitor a javafx property. Each change on property will trigger the given message type.
-    * The property is set as source and the new value is given as content.
-    * @param property to be monitored.
-    * @param identifier to use for sending messages.
-    */
-   public static final void monitorProperty(ReadOnlyProperty<?> property, String identifier)
-   {
-      monitorProperty(DEFAULTCONTEXT, property, identifier);
-   }
-   
-   /**
-    *  Monitor a javafx property. Each change on property will trigger the given message type.
-    * The property is set as source and the new value is given as content.
-    *
-    * @param context the context
-    * @param property to be monitored.
-    * @param identifier to use for sending messages.
-    */
-   public static final void monitorProperty(Object context, ReadOnlyProperty<?> property, String identifier)
-   {
-      property.addListener((v, o, n) -> { sendMessage(context, property, identifier, n); });
    }
 }

@@ -2,8 +2,10 @@ package net.alantea.horizon.message.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.alantea.horizon.message.Message;
@@ -80,47 +82,72 @@ public class SendingManager extends RegisterManager
    {
       // Get context
       Object context = (message.getContext() == null) ? DEFAULTCONTEXT : message.getContext();
-      
+
       // get subscription map for context
-      Map<Object, List<Object>> contextMap = getSubscribeMap().get(message.getIdentifier());
-      
+      Map<Object, List<Object>> specificContextMap = getSubscribeMap().get(message.getIdentifier());
+      Map<Object, List<Object>> contextMap = null;
+      Set<Object> set = null;
+
       // if there is something to do
-      if (contextMap != null)
+      if (specificContextMap != null)
       {
-         // Special case : do it for all contexts
-         if (context.equals(ALLCONTEXTS))
+         contextMap = new HashMap<>(specificContextMap);
+         set = specificContextMap.keySet();
+      }
+      else
+      {
+         contextMap = new HashMap<>();
+         set = contextMap.keySet();
+      }
+
+
+      // get subscription map for all identifiers
+      Map<Object, List<Object>> allContextMap = getSubscribeMap().get("");
+      if (allContextMap != null)
+      {
+         for (Object o : allContextMap.keySet())
          {
-            // Loop on contexts
-            contextMap.keySet().forEach((ctx) -> {
-               // get listener list
-               List<Object> list = contextMap.get(ctx);
-               if (list != null)
-               {
-                  // Loop on subscribers
-                  list.forEach((subscriber) -> {
-                     // send message
-                     sendMessageToReceiver(message, subscriber);
-                  });
-               }
-            }); 
-         }
-         else
-         {
-            // get listener list
-            List<Object> list = contextMap.get(context);
-            if (list != null)
+            if (! set.contains(o))
             {
-               Object[] objs = list.toArray();
-               // Loop on subscribers
-               for(Object subscriber : objs) 
-               {
-                  // send message
-                  sendMessageToReceiver(message, subscriber);
-               }
+               contextMap.put(o, allContextMap.get(o));
             }
          }
       }
-      
+
+      // Special case : do it for all contexts
+      if (context.equals(ALLCONTEXTS))
+      {
+         // Loop on contexts
+         for (Object ctx : contextMap.keySet())
+         {
+            // get listener list
+            List<Object> list = contextMap.get(ctx);
+            if (list != null)
+            {
+               // Loop on subscribers
+               list.forEach((subscriber) -> {
+                  // send message
+                  sendMessageToReceiver(message, subscriber);
+               });
+            }
+         }; 
+      }
+      else
+      {
+         // get listener list
+         List<Object> list = contextMap.get(context);
+         if (list != null)
+         {
+            Object[] objs = list.toArray();
+            // Loop on subscribers
+            for(Object subscriber : objs) 
+            {
+               // send message
+               sendMessageToReceiver(message, subscriber);
+            }
+         }
+      }
+
       if (message.getSender() != null)
       {
          // Send message to objects listening to this source

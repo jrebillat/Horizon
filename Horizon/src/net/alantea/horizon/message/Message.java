@@ -25,6 +25,29 @@ public class Message
    private boolean confidential;
    
    /**
+    * Instantiates a new simple message.
+    *
+    * @param id the identifier
+    * @param content the content
+    */
+   public Message(String id, Object content)
+   {
+      this(Messenger.DEFAULTCONTEXT, "", null, id, content, false);
+   }
+   
+   /**
+    * Instantiates a new simple message.
+    *
+    * @param sender the sender
+    * @param id the identifier
+    * @param content the content
+    */
+   public Message(Object sender, String id, Object content)
+   {
+      this(Messenger.DEFAULTCONTEXT, sender, null, id, content, false);
+   }
+   
+   /**
     * Instantiates a new message.
     *
     * @param sender the sender

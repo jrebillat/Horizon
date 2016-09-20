@@ -167,19 +167,24 @@ public class RegisterManager extends SubscriptionManager
     */
    private static int registerToMessages(Object context, Object object, String identifier)
    {
-      // get map of identifiers managed by object
-      Map<String, Map<Class<?>, Method>> map = getMethods(object.getClass());
-      
-      // Loop on identifiers
-      for (String id : map.keySet())
+      if (identifier != null)
       {
-         // test if object is concerned
-         if ((id != "") && ((identifier == null) || (id.equals(identifier))))
+         // add subscriber
+         addSubscription(context, identifier, object);
+         return 1;
+      }
+      else
+      {
+         // get map of identifiers managed by object
+         Map<String, Map<Class<?>, Method>> map = getMethods(object.getClass());
+         
+         // Loop on identifiers
+         for (String id : map.keySet())
          {
             // add subscriber
             addSubscription(context, id, object);
-         }
-      };
-      return map.size();
+         };
+         return map.size();
+      }
    }
 }
