@@ -1,21 +1,20 @@
 package net.alantea.horizon.message.internal;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * The Class RegisterManager. It deals with objects registering to events
+ * The Class RegisterManager. It deals with objects registering to events (all identifiers) in contexts, or for all the application.
  */
 public class RegisterManager extends SubscriptionManager
 {
-   
-   /** The Constant ALL_IDENTIFIERS. */
-   private static final String ALL_IDENTIFIERS = null;
-
-   /** The 'subscribers to all events' map. */
+   /** The 'registered to all events' list. */
    private static List<Object> catchAllList = new ArrayList<>();
+
+   /** The registered map. */
+   private static Map<Object, List<Object>> registeredmap = new HashMap<>();
 
    /**
     * Register to all messages that we are waiting for in default context. This method search for
@@ -26,9 +25,9 @@ public class RegisterManager extends SubscriptionManager
     * @param object the object
     * @return the number of messages ID registered
     */
-   public static final int register(Object object)
+   public static final void register(Object object)
    {
-      return register(DEFAULTCONTEXT, object);
+      register(DEFAULTCONTEXT, object);
    }
    
    /**
@@ -49,38 +48,29 @@ public class RegisterManager extends SubscriptionManager
     *
     * @param context the context
     * @param object the object
-    * @return the number of messages ID registered
     */
-   public static final int register(Object context, Object object)
+   public static final void register(Object context, Object object)
    {
       // Silly call
       if (object == null)
       {
-         return 0;
+         return;
       }
-      // register to all identifiers
-      return registerToMessages(context, object, ALL_IDENTIFIERS);
-   }
-
-   /**
-    * Register to specific messages that we are waiting for in the context. This method search for
-    * all @Listen(message="ID") or &#64;Listen(messages={"ID1", "ID2"...}) annotations with correct identifier.
-    * It also look to all "onXXXXMessage" methods when XXXX is the identifier. Then it subscribes the object to 
-    * corresponding ID messages.
-    *
-    * @param context the context
-    * @param object the object
-    * @param identifier the identifier or null for all
-    * @return the number of messages ID registered
-    */
-   public static final int register(Object context, Object object, String identifier)
-   {
-      // Silly call
-      if (object == null)
+      
+      // Calculate context (in case of NULL context given).
+      Object realContext = (context == null) ? DEFAULTCONTEXT : context;
+      
+      List<Object> registered = registeredmap.get(realContext);
+      if (registered == null)
       {
-         return 0;
+         registered = new ArrayList<Object>();
+         registeredmap.put(realContext, registered);
       }
-      return registerToMessages(context, object, identifier);
+      // register
+      if (! registered.contains(object))
+      {
+         registered.add(object);
+      }
    }
 
    /**
@@ -113,32 +103,29 @@ public class RegisterManager extends SubscriptionManager
     * Unregister in given context.
     *
     * @param context the context
-    * @param param the param
+    * @param listener the listener
     */
-   public static final void unregister(Object context, Object param)
+   public static final void unregister(Object context, Object listener)
    {
       // Silly call
-      if (param == null)
+      if (listener == null)
       {
          return;
       }
-
+      
       // Calculate context (in case of NULL context given).
       Object realContext = (context == null) ? DEFAULTCONTEXT : context;
       
-      // Search in ids
-      for (String id : getSubscribeMap().keySet())
+      List<Object> registered = registeredmap.get(realContext);
+      if (registered == null)
       {
-         // get map of concerned contexts
-         Map<Object, List<Object>> contextMap = getSubscribeMap().get(id);
-         
-         // get subscribers in context
-         List<Object> list = contextMap.get(realContext);
-         if ((list != null) && (list.contains(param)))
-         {
-            // remove
-            list.remove(param);
-         }
+         return;
+      }
+      
+      // unregister
+      if (registered.contains(listener))
+      {
+         registered.remove(listener);
       }
    }
 
@@ -156,35 +143,24 @@ public class RegisterManager extends SubscriptionManager
          catchAllList.remove(object);
       }
    }
-
+   
    /**
-    * Register as listener to messages.
+    * Gets the registered.
     *
     * @param context the context
-    * @param object the object
-    * @param identifier the identifier or null for all
-    * @return the number of messages ID registered
+    * @return the registered
     */
-   private static int registerToMessages(Object context, Object object, String identifier)
+   protected static List<Object> getRegistered(Object context)
    {
-      if (identifier != null)
+      // Calculate context (in case of NULL context given).
+      Object realContext = (context == null) ? DEFAULTCONTEXT : context;
+      
+      List<Object> registered = registeredmap.get(realContext);
+      if (registered == null)
       {
-         // add subscriber
-         addSubscription(context, identifier, object);
-         return 1;
+         registered = new ArrayList<Object>();
+         registeredmap.put(realContext, registered);
       }
-      else
-      {
-         // get map of identifiers managed by object
-         Map<String, Map<Class<?>, Method>> map = getMethods(object.getClass());
-         
-         // Loop on identifiers
-         for (String id : map.keySet())
-         {
-            // add subscriber
-            addSubscription(context, id, object);
-         };
-         return map.size();
-      }
+      return registered;
    }
 }

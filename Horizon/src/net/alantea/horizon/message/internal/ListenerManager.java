@@ -1,9 +1,10 @@
 package net.alantea.horizon.message.internal;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
@@ -11,6 +12,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class ListenerManager extends MethodsManager
 {
+   /** The Constant EMPTYLIST. */
+   protected static final List<Object> EMPTYLIST = Collections.unmodifiableList(new ArrayList<Object>());
 
    /** The listener map. A map < message source, List<subscribers>>*/
    private static Map<Object, List<Object>> listenermap = new ConcurrentHashMap<>();
@@ -39,7 +42,7 @@ public class ListenerManager extends MethodsManager
          if (listeners == null)
          {
             // create empty list and add it to map.
-            listeners = new CopyOnWriteArrayList<>();
+            listeners = new ArrayList<>();
             listenermap.put(source, listeners);
          }
          
@@ -121,12 +124,47 @@ public class ListenerManager extends MethodsManager
    }
 
    /**
-    * Gets the listener map.
+    * Gets the listeners for a source.
     *
     * @return the listener map
     */
-   protected static final Map<Object, List<Object>> getListenermap()
+   protected static final List<Object> getListeners(Object source)
    {
-      return listenermap;
+      if (source == null)
+      {
+         return EMPTYLIST;
+      }
+      
+      List<Object> listeners = listenermap.get(source);
+      // First time : the list do not exist.
+      if (listeners == null)
+      {
+         // create empty list and add it to map.
+         listeners = new ArrayList<>();
+         listenermap.put(source, listeners);
+      }
+      return listeners;
+   }
+   
+   /**
+    * Checks if listener is listening to the source.
+    *
+    * @param source the source
+    * @param listener the listener
+    * @return true, if is listening
+    */
+   protected boolean isListening(Object source, Object listener)
+   {
+      // Silly case
+      if ((source == null) || (listener == null))
+      {
+         return false;
+      }
+      List<Object> list = listenermap.get(source);
+      if (list == null)
+      {
+         return false;
+      }
+      return list.contains(listener);
    }
 }

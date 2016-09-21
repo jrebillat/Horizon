@@ -11,13 +11,13 @@ public interface MessageSubscriber
    public void onMessage(Message message);
    
    /**
-    * Subscribe to a message type. Please consider it carefully before overriding !
+    * Register to a message type. Please consider it carefully before overriding !
     *
     * @param id the id
     */
-   public default void subscribe(String id)
+   public default void register(String id)
    {
-      Messenger.register(Messenger.DEFAULTCONTEXT, this, id);
+      Messenger.register(id, this);
    }
    
    /**
@@ -26,28 +26,28 @@ public interface MessageSubscriber
     * @param id the id
     * @param context the context
     */
-   public default void subscribe(String id, Object context)
+   public default void register(String id, Object context)
    {
       Messenger.addSubscription(context, id, this);
    }
    
    /**
-    * Unsubscribe to a message type. Please consider it carefully before overriding !
+    * Unregister to a message type. Please consider it carefully before overriding !
     *
     * @param id the id
     */
-   public default void unsubscribe(String id)
+   public default void unregister(String id)
    {
-      Messenger.removeSubscription(id, this);
+      Messenger.unregister(id, this);
    }
    
    /**
-    * Unsubscribe to a message type. Please consider it carefully before overriding !
+    * Unregister to a message type. Please consider it carefully before overriding !
     *
     * @param id the id
     * @param context the context
     */
-   public default void unsubscribe(String id, Object context)
+   public default void unregister(String id, Object context)
    {
       Messenger.removeSubscription(context, id, this);
    }

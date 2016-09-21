@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The Class SubscriptionManager. It contains the methods to manage the subscription process for identifiers and contexts.
+ * The Class SubscriptionManager, to manage objects that subscribe to one or several identifiers in one or several contexts.
+ * It contains the methods to manage the subscription process for identifiers and contexts.
  */
 public class SubscriptionManager extends ListenerManager
 {
@@ -14,21 +15,8 @@ public class SubscriptionManager extends ListenerManager
    /** The default context constant. */
    public static final String DEFAULTCONTEXT = "__Default C0ntext__";
 
-   /** The "catch all" context constant. */
-   public static final String ALLCONTEXTS = "__All C0ntexts__";
-
    /** The subscribe map. A map <Message identifier, Map<Context, List<subscribers>>> */
    private static Map<String, Map<Object, List<Object>>> subscribeMap = new HashMap<>();
-
-   /**
-    * Gets the subscribe map.
-    *
-    * @return the subscribe map
-    */
-   protected static Map<String, Map<Object, List<Object>>> getSubscribeMap()
-   {
-      return subscribeMap;
-   }
    
    /**
     * Add a subscriber to a message type in a context.
@@ -126,5 +114,46 @@ public class SubscriptionManager extends ListenerManager
          // remove it
          list.remove(subscriber);
       }
+   }
+   
+   /**
+    * Gets the subscribers.
+    *
+    * @param identifier the identifier
+    * @return the subscribers
+    */
+   protected static List<Object> getSubscribers(String identifier)
+   {
+      return getSubscribers(DEFAULTCONTEXT, identifier);
+   }
+   
+   /**
+    * Gets the subscribers for and identifier in a context.
+    *
+    * @param context the context
+    * @param identifier the identifier
+    * @return the subscribers
+    */
+   protected static List<Object> getSubscribers(Object context, String identifier)
+   {
+      List<Object> ret = EMPTYLIST;
+      
+      if (identifier != null)
+      {
+         // Calculate context (in case of NULL context given).
+         Object realContext = (context == null) ? DEFAULTCONTEXT : context;
+
+         // get map of registered subscribers in contexts for the identifier
+         Map<Object, List<Object>> contextMap = subscribeMap.get(identifier);
+         
+         // If got null
+         if (contextMap != null)
+         {
+            // get list of subscribers in the given context
+            ret = contextMap.get(realContext);
+         }
+      }
+
+      return ret;
    }
 }

@@ -46,7 +46,7 @@ public class PropertyMonitor extends SendingManager
       if ((setIdentifier != null) && (property instanceof Property))
       {
          PropertyMonitorWrapper wrapper = new PropertyMonitorWrapper((Property<?>) property);
-         register(context, wrapper, setIdentifier);
+         addSubscription(context, setIdentifier, wrapper);
       }
    }
 }
