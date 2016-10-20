@@ -170,35 +170,38 @@ public class SendingManager extends RegisterManager
     */
    private static void startQueueThread()
    {
-      queueThread = new Thread(() -> {
-         while (true)
-         {
-            Message message;
-            // Loop on messages in the queue
-            do
-            {
-               // get next message in queue
-               message = queuelist.poll();
-               // send it
-               sendSingleMessage(message);
-            }
-            while (message != null);
-            
-            // sleep a while
-            try
-            {
-               Thread.sleep(interval);
-            }
-            catch (Exception e)
-            {
-               // really : don't care !
-            }
-         }
-      });
+      queueThread = new Thread(SendingManager::queueThreadBody);
       
       // the queue is a daemon
       queueThread.setDaemon(true);
       queueThread.start();
+   }
+   
+   private static void queueThreadBody()
+   {
+      while (true)
+      {
+         Message message;
+         // Loop on messages in the queue
+         do
+         {
+            // get next message in queue
+            message = queuelist.poll();
+            // send it
+            sendSingleMessage(message);
+         }
+         while (message != null);
+         
+         // sleep a while
+         try
+         {
+            Thread.sleep(interval);
+         }
+         catch (Exception e)
+         {
+            // really : don't care !
+         }
+      }
    }
 
    /**
