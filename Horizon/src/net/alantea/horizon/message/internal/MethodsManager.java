@@ -179,17 +179,20 @@ public class MethodsManager
             // If the method is annoted with @Listen and analyse Listen annotation
             if (method.isAnnotationPresent(Listen.class))
             {
-               Listen annotation = method.getAnnotation(Listen.class);
-               // Only search if not the default identifier in message field
-               if (!DEFAULTID.equals(annotation.message()))
+               Listen[] annotations = method.getAnnotationsByType(Listen.class);
+               for (Listen annotation : annotations)
                {
-                  // Yep, that's one ! Register in map.
-                  registerListeningMethod(annotation.message(), method, methodmap);
-               }
-               // Search for all identifiers listed in messages
-               for( String id : annotation.messages())
-               {
-                  registerListeningMethod(id, method, methodmap);
+                  // Only search if not the default identifier in message field
+                  if (!DEFAULTID.equals(annotation.message()))
+                  {
+                     // Yep, that's one ! Register in map.
+                     registerListeningMethod(annotation.message(), method, methodmap);
+                  }
+                  // Search for all identifiers listed in messages
+                  for( String id : annotation.messages())
+                  {
+                     registerListeningMethod(id, method, methodmap);
+                  }
                }
             }
             else if ((name.startsWith(METHODHEADER)) && (name.endsWith(METHODFOOTER)))
