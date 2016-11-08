@@ -122,7 +122,7 @@ Calling the main method should output :
 The source NewBorn has been created.
 ```
 
-#Using contexts
+# Using contexts
 The process shown so far is such that a registered listener will catch all messages provided with the correct identifiers, wherever the message is sent in the application. There are may reasons that the messages to catch should be emitted in a special case, such as a dialog box or an tabbed pane. And any other messages, even those of known and awaited identifiers, should be ignored. In short words : sometimes we need a context for sending and receiving messages.
 
 A context may be inserted in any message before sending. In fact, there are also contexts in messages : messages with "no context" - a null context - are in fact using a special "default context".
@@ -130,7 +130,7 @@ A context may be inserted in any message before sending. In fact, there are also
 All methods in the Messenger class are doubled : one simplified version with no context specification, using the default context, and another with a context as first parameter.
 =======
 # Horizon
-##Event message driven tool for applications
+## Event message driven tool for applications
 The goal of Horizon is to offer tools for exchanging messages between Java objects
 
 ## Why using messages ?
