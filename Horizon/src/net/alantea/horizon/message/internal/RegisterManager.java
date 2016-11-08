@@ -23,7 +23,6 @@ public class RegisterManager extends SubscriptionManager
     * corresponding IDs messages.
     *
     * @param object the object
-    * @return the number of messages ID registered
     */
    public static final void register(Object object)
    {

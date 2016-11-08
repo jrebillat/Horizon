@@ -96,7 +96,7 @@ public class ListenerManager extends MethodsManager
    /**
     * Removes all horizon listeners from a specific source.
     *
-    * @param object the horizon source
+    * @param source the horizon source
     * @return true, if successful
     */
    public static final boolean removeAllHorizonListeners(Object source)
