@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.alantea</groupId>
   <artifactId>horizon</artifactId>
-  <version>0.4.2</version>
+  <version>0.4.3-SNAPSHOT</version>
   <packaging>jar</packaging>
   <distributionManagement>
     <snapshotRepository>
@@ -92,6 +92,6 @@
 	    <connection>scm:git:git@github.com:jrebillat/Horizon.git</connection>
 	    <url>scm:git:git@github.com:jrebillat/Horizon.git</url>
 	    <developerConnection>scm:git:git@github.com:jrebillat/Horizon.git</developerConnection>
-      <tag>horizon-0.4.2</tag>
+      <tag>HEAD</tag>
   </scm>
 </project>
