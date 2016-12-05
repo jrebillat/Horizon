@@ -3,6 +3,7 @@
   <groupId>net.alantea</groupId>
   <artifactId>horizon</artifactId>
   <version>0.4.3</version>
+  <name>Horizon</name>
   <packaging>jar</packaging>
   <description>Messenging system</description>
   <licenses>
