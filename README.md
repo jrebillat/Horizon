@@ -237,7 +237,7 @@ public class DemoMain
       DemoTarget target = new DemoTarget();
       Messenger.register(target);
 
-      DemoSource source = new DemoSource("NewBorn");
+     DemoSource source = new DemoSource("NewBorn");
    }
 
 }
