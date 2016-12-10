@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="AllTests">
+
+  <test name="Test">
+    <classes>
+       <class name="net.alantea.horizon.testng.SimpleMessageToUniverseTest" />
+       <class name="net.alantea.horizon.testng.SimpleMessageExchangeTest" />
+       <class name="net.alantea.horizon.testng.SimpleMessageToUniverseTestConcurrent" />
+       <class name="net.alantea.horizon.testng.SimpleMessageToUniverseTestThreaded" />
+       <class name="net.alantea.horizon.testng.SimpleMessageToUniverseTestHyperthreaded" />
+       <class name="net.alantea.horizon.testng.HorizonListenerTest" />
+       <class name="net.alantea.horizon.testng.HorizonSubscriptionTest" />
+       <class name="net.alantea.horizon.testng.ContextsTest" />
+       <class name="net.alantea.horizon.testng.SynchronousTest" />
+       <class name="net.alantea.horizon.testng.ListenMessagesTest" />
+       <class name="net.alantea.horizon.testng.PropertiesTest" />
+    </classes>
+  </test>
+  
+</suite>  	

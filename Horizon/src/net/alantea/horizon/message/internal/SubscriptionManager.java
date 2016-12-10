@@ -19,6 +19,17 @@ public class SubscriptionManager extends ListenerManager
    private static Map<String, Map<Object, List<Object>>> subscribeMap = new HashMap<>();
    
    /**
+    * Add a subscriber to a message type in the default context.
+    *
+    * @param identifier the identifier
+    * @param subscriber the subscriber
+    */
+   public static final void addSubscription(String identifier, Object subscriber)
+   {
+      addSubscription(DEFAULTCONTEXT, identifier, subscriber);
+   }
+   
+   /**
     * Add a subscriber to a message type in a context.
     *
     * @param context the context or null
