@@ -117,8 +117,8 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.alantea</groupId>
-			<artifactId>socks</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>liteprops</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

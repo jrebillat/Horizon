@@ -1,7 +1,7 @@
 package net.alantea.horizon.message.internal;
 
-import javafx.beans.property.Property;
 import net.alantea.horizon.message.Message;
+import net.alantea.liteprops.Property;
 
 public class PropertyMonitorWrapper
 {
@@ -16,10 +16,10 @@ public class PropertyMonitorWrapper
    @SuppressWarnings({ "unused", "unchecked" })
    private void onMessage(Message message)
    {
-      Object destination = property.getValue();
+      Object destination = property.get();
       if ((destination != null) && (destination.getClass().isAssignableFrom(message.getContent().getClass())))
       {
-         property.setValue(message.getContent());
+         property.set(message.getContent());
       }
    }
 
