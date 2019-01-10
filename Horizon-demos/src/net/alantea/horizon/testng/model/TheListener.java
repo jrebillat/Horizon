@@ -2,7 +2,7 @@ package net.alantea.horizon.testng.model;
 
 import org.testng.Assert;
 
-import net.alantea.horizon.message.Listen;
+import net.alantea.horizon.message.Receive;
 import net.alantea.horizon.message.Message;
 import net.alantea.horizon.message.MessageSubscriber;
 
@@ -59,7 +59,7 @@ class TheListener implements MessageSubscriber
       System.out.println("I am the listener " + name + " for " + id + ", I specifally got " + content + " !");
    }
    
-   @Listen(message=ANOTHERID)
+   @Receive(message=ANOTHERID)
    public void onAnotherMessage(Message message)
    {
       id = message.getIdentifier();
@@ -70,7 +70,7 @@ class TheListener implements MessageSubscriber
       System.out.println("I am the listener " + name + " for " + id + ", I unknownly got " + content + " !");
    }
    
-   @Listen(message=SPECIALID)
+   @Receive(message=SPECIALID)
    public void onSpecialMessage(Message message)
    {
       id = message.getIdentifier();

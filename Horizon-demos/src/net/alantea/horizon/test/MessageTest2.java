@@ -4,7 +4,7 @@ import net.alantea.horizon.message.Message;
 import net.alantea.horizon.message.Messenger;
 import net.alantea.horizon.message.MessageSource;
 import net.alantea.horizon.message.MessageSubscriber;
-import net.alantea.horizon.message.Listen;
+import net.alantea.horizon.message.Receive;
 
 public class MessageTest2
 {
@@ -57,14 +57,14 @@ public class MessageTest2
          System.out.println("I am 2, I received " + message.getIdentifier() + " !");
       }
       
-      @Listen(message="Test")
+      @Receive(message="Test")
       public void test(Message message)
       {
          System.out.println("I am 2, I got " + message.getContent() + " as test !");
          Messenger.sendMessage(this, listener3, message.getIdentifier(), new Integer((Integer)message.getContent() + 100), true);
       }
       
-      @Listen(message="End")
+      @Receive(message="End")
       public void end(Message message)
       {
          System.out.println("I am 2, I got " + message.getContent() + " : exiting.");

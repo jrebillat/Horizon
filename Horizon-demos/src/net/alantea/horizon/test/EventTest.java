@@ -1,6 +1,6 @@
 package net.alantea.horizon.test;
 
-import net.alantea.horizon.message.Listen;
+import net.alantea.horizon.message.Receive;
 import net.alantea.horizon.message.Message;
 import net.alantea.horizon.message.Messenger;
 
@@ -44,7 +44,7 @@ public class EventTest
          System.out.println("Message 1 got in " + name + " !");
       }
       
-      @Listen(message="Event2")
+      @Receive(message="Event2")
       public void onMyMessage(Message event)
       {
          System.out.println("Message 2 got in " + name + " !");
@@ -63,7 +63,7 @@ public class EventTest
          super(key);
       }
       
-      @Listen(message="Event2")
+      @Receive(message="Event2")
       public void onMyTwoMessage(Message event)
       {
          System.out.println("Message 2 got in " + getName() + " !");

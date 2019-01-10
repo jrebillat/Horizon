@@ -4,7 +4,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import net.alantea.horizon.message.Listen;
+import net.alantea.horizon.message.Receive;
 import net.alantea.horizon.message.Messenger;
 
 public class PropertyMonitorDemo
@@ -31,7 +31,7 @@ public class PropertyMonitorDemo
 
    private static class DoubleWatchingElement
    {
-      @Listen(message=DOUBLEMODIFIED)
+      @Receive(message=DOUBLEMODIFIED)
       private void manageDouble(Double value)
       {
          System.out.println("Double property modified to : " + value);
@@ -41,7 +41,7 @@ public class PropertyMonitorDemo
 
    private static class StringWatchingElement
    {
-      @Listen(message=STRINGMODIFIED)
+      @Receive(message=STRINGMODIFIED)
       private void manageDouble(String value)
       {
          System.out.println("String property modified to : '" + value + "'");

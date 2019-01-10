@@ -6,7 +6,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import net.alantea.horizon.message.Listen;
+import net.alantea.horizon.message.Receive;
 import net.alantea.horizon.message.Messenger;
 
 /**
@@ -99,7 +99,7 @@ public class Count
        *
        * @param value the integer value
        */
-      @Listen(message=ADD)
+      @Receive(message=ADD)
       private void onAction(Integer value)
       {
          // get current count

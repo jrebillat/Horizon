@@ -114,4 +114,11 @@
 	    <developerConnection>scm:git:git@github.com:jrebillat/Horizon.git</developerConnection>
       <tag>HEAD</tag>
   </scm>
+	<dependencies>
+		<dependency>
+			<groupId>net.alantea</groupId>
+			<artifactId>socks</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
 </project>

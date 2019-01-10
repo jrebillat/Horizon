@@ -1,6 +1,6 @@
 package net.alantea.horizon.demos.simple;
 
-import net.alantea.horizon.message.Listen;
+import net.alantea.horizon.message.Receive;
 import net.alantea.horizon.message.Messenger;
 import net.alantea.horizon.message.internal.SendingManager.Mode;
 
@@ -41,7 +41,7 @@ public class ListenDemo
        *
        * @param message the message
        */
-      @Listen(message="First")
+      @Receive(message="First")
       private void manage1(String content)
       {
          System.out.println("Got first message : " + content);
@@ -52,7 +52,7 @@ public class ListenDemo
        *
        * @param message the message
        */
-      @Listen(message="Second")
+      @Receive(message="Second")
       private void manage2(String content)
       {
          System.out.println("Got second message : " + content);
@@ -63,7 +63,7 @@ public class ListenDemo
        *
        * @param message the message
        */
-      @Listen(message="Third")
+      @Receive(message="Third")
       private void manage3(String content)
       {
          System.out.println("Got third message : " + content);

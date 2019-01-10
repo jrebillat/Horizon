@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.alantea.horizon.message.Listen;
+import net.alantea.horizon.message.Receive;
 import net.alantea.horizon.message.Message;
 
 /**
@@ -177,10 +177,10 @@ public class MethodsManager
          {
             String name = method.getName();
             // If the method is annoted with @Listen and analyse Listen annotation
-            if (method.isAnnotationPresent(Listen.class))
+            if (method.isAnnotationPresent(Receive.class))
             {
-               Listen[] annotations = method.getAnnotationsByType(Listen.class);
-               for (Listen annotation : annotations)
+               Receive[] annotations = method.getAnnotationsByType(Receive.class);
+               for (Receive annotation : annotations)
                {
                   // Only search if not the default identifier in message field
                   if (!DEFAULTID.equals(annotation.message()))

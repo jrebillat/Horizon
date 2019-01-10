@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Horizon
 ##Event message driven tool for applications
 The goal of Horizon is to offer tools for exchanging messages between Java objects
@@ -247,4 +246,3 @@ Calling the main method should output :
 ...
 The source NewBorn has been created.
 ...
->>>>>>> stash

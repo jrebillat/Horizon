@@ -3,7 +3,7 @@ package net.alantea.horizon.test;
 import net.alantea.horizon.message.Message;
 import net.alantea.horizon.message.MessageSource;
 import net.alantea.horizon.message.MessageSubscriber;
-import net.alantea.horizon.message.Listen;
+import net.alantea.horizon.message.Receive;
 
 public class MessageTest
 {
@@ -56,7 +56,7 @@ public class MessageTest
          sendMessage(listener3, message.getIdentifier(), new Integer((Integer)message.getContent() + 1));
       }
       
-      @Listen(message="test")
+      @Receive(message="test")
       public void test(Message message)
       {
          System.out.println("I am 2, I got " + message.getContent() + " as test !");
