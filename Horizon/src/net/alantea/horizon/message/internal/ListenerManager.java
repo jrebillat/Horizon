@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * The Class ListenerManager. It contains the methods to manage the listening process for sources.
  */
-public class ListenerManager extends MethodsManager
+public class ListenerManager
 {
    /** The Constant EMPTYLIST. */
    protected static final List<Object> EMPTYLIST = Collections.unmodifiableList(new ArrayList<Object>());
@@ -51,7 +51,7 @@ public class ListenerManager extends MethodsManager
             //Add listener if it is not already registered
             listeners.add(listener);
             // prepare list of methods for later use
-            getMethods(listener.getClass());
+            MethodsManager.getMethods(listener.getClass());
          }
       }
       return true;
@@ -129,7 +129,7 @@ public class ListenerManager extends MethodsManager
     * @param source the source
     * @return the listener map
     */
-   protected static final List<Object> getListeners(Object source)
+   public static final List<Object> getListeners(Object source)
    {
       if (source == null)
       {
@@ -154,7 +154,7 @@ public class ListenerManager extends MethodsManager
     * @param listener the listener
     * @return true, if is listening
     */
-   protected boolean isListening(Object source, Object listener)
+   public static boolean isListening(Object source, Object listener)
    {
       // Silly case
       if ((source == null) || (listener == null))

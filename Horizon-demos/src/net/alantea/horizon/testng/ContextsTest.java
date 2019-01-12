@@ -4,6 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import net.alantea.horizon.message.Messenger;
+import net.alantea.horizon.message.Mode;
 import net.alantea.horizon.testng.model.TheListener;
 
 public class ContextsTest
@@ -17,7 +18,7 @@ public class ContextsTest
    @Test
    public void testSetMode()
    {
-      Messenger.setMode(Messenger.Mode.SYNCHRONOUS);
+      Messenger.setMode(Mode.SYNCHRONOUS);
    }
    
    @Test(dependsOnMethods = {"testSetMode"})

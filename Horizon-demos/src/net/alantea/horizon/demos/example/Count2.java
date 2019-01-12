@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import net.alantea.horizon.message.Receive;
+import net.alantea.horizon.message.internal.RegisterManager;
 import net.alantea.horizon.message.Message;
 import net.alantea.horizon.message.Messenger;
 
@@ -42,7 +43,7 @@ public class Count2
       frame.getContentPane().add(label);
       
       // Create the listeners to wait for messages and register it.
-      Messenger.register(new AddSubListener(label));
+      RegisterManager.register(new AddSubListener(label));
 
       // Add a increment button. Click will send an ADD message with 1 value.
       JButton incr = new JButton(">");

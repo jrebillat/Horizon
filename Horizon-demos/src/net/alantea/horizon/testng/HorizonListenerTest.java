@@ -4,6 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import net.alantea.horizon.message.Messenger;
+import net.alantea.horizon.message.Mode;
 import net.alantea.horizon.testng.model.TheListener;
 
 public class HorizonListenerTest
@@ -14,7 +15,7 @@ public class HorizonListenerTest
    @Test
    public void testSetMode()
    {
-      Messenger.setMode(Messenger.Mode.SYNCHRONOUS);
+      Messenger.setMode(Mode.SYNCHRONOUS);
    }
    
    @Test(dependsOnMethods = {"testSetMode"})
@@ -26,25 +27,25 @@ public class HorizonListenerTest
    @Test(dependsOnMethods = {"testSendMessageInTheVoid"})
    public void testSetBadListener()
    {
-      Messenger.addHorizonListener(this, null);
+      Messenger.addListener(this, null);
    }
    
    @Test(dependsOnMethods = {"testSendMessageInTheVoid"})
    public void testSetSillyListener()
    {
-      Messenger.addHorizonListener(null, null);
+      Messenger.addListener(null, null);
    }
    
    @Test(dependsOnMethods = {"testSendMessageInTheVoid"})
    public void testSetListenerToVoid()
    {
-      Messenger.addHorizonListener(null, this);
+      Messenger.addListener(null, this);
    }
    
    @Test(dependsOnMethods = {"testSetBadListener"})
    public void testSetFirstListener()
    {
-      Messenger.addHorizonListener(this, listener1);
+      Messenger.addListener(this, listener1);
    }
    
    @Test(groups="basis", dependsOnMethods = {"testSetMode", "testSetFirstListener"})
@@ -67,13 +68,13 @@ public class HorizonListenerTest
    @Test(dependsOnMethods = {"testSetBadListener"})
    public void testResetFirstListener()
    {
-      Messenger.addHorizonListener(this, listener1);
+      Messenger.addListener(this, listener1);
    }
    
    @Test(dependsOnMethods = {"testResetFirstListener"})
    public void testSetSecondListener()
    {
-      Messenger.addHorizonListener(this, listener2);
+      Messenger.addListener(this, listener2);
    }
    
    @Test(dependsOnMethods = {"testSendGlobalMessageToOneListener", "testSetSecondListener"})
@@ -93,29 +94,29 @@ public class HorizonListenerTest
    @Test(dependsOnMethods = {"testSendMessage2"})
    public void testRemoveSecondListener()
    {
-      Messenger.removeHorizonListener(this, listener2);
+      Messenger.removeListener(this, listener2);
    }
    
    @Test(dependsOnMethods = {"testSendMessage2"})
    public void testRemoveFromNothingListener()
    {
-      Messenger.removeHorizonListener(null, listener2);
+      Messenger.removeListener(null, listener2);
    }
    
    @Test(dependsOnMethods = {"testSendMessage2"})
    public void testRemoveFromAnythingListener()
    {
-      Messenger.removeHorizonListener("AnyString", listener2);
+      Messenger.removeListener("AnyString", listener2);
    }
    
    @Test(dependsOnMethods = {"testSendMessage2"})
    public void testRemoveNotAListener()
    {
-      Messenger.addHorizonListener("SomeString", listener1);
-      Messenger.removeHorizonListener("SomeString", listener2);
+      Messenger.removeListener("SomeString", listener1);
+      Messenger.removeListener("SomeString", listener2);
       
       // Clean
-      Messenger.removeHorizonListener("SomeString", listener1);
+      Messenger.removeListener("SomeString", listener1);
    }
    
    @Test(dependsOnMethods = {"testRemoveSecondListener"})
@@ -132,19 +133,19 @@ public class HorizonListenerTest
    @Test(dependsOnMethods = {"testSendGlobalMessageToOnlyOneListener"})
    public void testRemoveAllListeners()
    {
-      Messenger.removeAllHorizonListeners(this);
+      Messenger.removeAllListeners(this);
    }
    
    @Test(dependsOnMethods = {"testSendGlobalMessageToOnlyOneListener"})
    public void testRemoveSillyListeners()
    {
-      Messenger.removeAllHorizonListeners(null);
+      Messenger.removeAllListeners(null);
    }
    
    @Test(dependsOnMethods = {"testSendGlobalMessageToOnlyOneListener"})
    public void testRemoveEmptyListeners()
    {
-      Messenger.removeAllHorizonListeners("BadIdentifier");
+      Messenger.removeAllListeners("BadIdentifier");
    }
    
    @Test(dependsOnMethods = {"testRemoveSecondListener"})

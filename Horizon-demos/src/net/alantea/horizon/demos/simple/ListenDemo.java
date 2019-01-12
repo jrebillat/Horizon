@@ -2,7 +2,7 @@ package net.alantea.horizon.demos.simple;
 
 import net.alantea.horizon.message.Receive;
 import net.alantea.horizon.message.Messenger;
-import net.alantea.horizon.message.internal.SendingManager.Mode;
+import net.alantea.horizon.message.Mode;
 
 /**
  * Simple basic messaging demonstration. The Listener instance is waiting for a message (any kind of message)

@@ -5,6 +5,7 @@ import net.alantea.horizon.message.Messenger;
 import net.alantea.horizon.message.MessageSource;
 import net.alantea.horizon.message.MessageSubscriber;
 import net.alantea.horizon.message.Receive;
+import net.alantea.horizon.message.internal.RegisterManager;
 
 public class MessageTest4
 {
@@ -43,7 +44,7 @@ public class MessageTest4
    {
       public TheListener1()
       {
-         Messenger.register(this);
+         RegisterManager.register(this);
       }
       
       public void onMessage(Message message)

@@ -4,6 +4,7 @@ import org.testng.annotations.Test;
 
 import net.alantea.horizon.message.Message;
 import net.alantea.horizon.message.Messenger;
+import net.alantea.horizon.message.Mode;
 import net.alantea.horizon.testng.model.TheListener;
 
 public class HorizonSubscriptionTest
@@ -14,19 +15,19 @@ public class HorizonSubscriptionTest
    @Test
    public void testSetMode()
    {
-      Messenger.setMode(Messenger.Mode.SYNCHRONOUS);
+      Messenger.setMode(Mode.SYNCHRONOUS);
    }
    
    @Test(dependsOnMethods = {"testSetMode"})
    public void testUnsubscribeEmpty()
    {
-      Messenger.removeSubscription(Messenger.DEFAULTCONTEXT, TheListener.SPECIFICID, listener2);
+      Messenger.removeSubscription(TheListener.SPECIFICID, listener2);
    }
    
    @Test(dependsOnMethods = {"testUnsubscribeEmpty"})
    public void testSubscribeToNull()
    {
-      Messenger.addSubscription(Messenger.DEFAULTCONTEXT, null, listener1);
+      Messenger.addSubscription(null, listener1);
    }
    
    @Test(dependsOnMethods = {"testUnsubscribeEmpty"})
@@ -44,7 +45,7 @@ public class HorizonSubscriptionTest
    @Test(dependsOnMethods = {"testUnsubscribeEmpty"})
    public void testSubscribeNull()
    {
-      Messenger.addSubscription(Messenger.DEFAULTCONTEXT, TheListener.SPECIFICID, null);
+      Messenger.addSubscription(TheListener.SPECIFICID, null);
    }
    
    @Test(dependsOnMethods = {"testUnsubscribeEmpty"})
@@ -124,7 +125,7 @@ public class HorizonSubscriptionTest
    @Test(dependsOnMethods = {"testUnsubscribeEmpty"})
    public void testUnregister()
    {
-      Messenger.addSubscription(Messenger.DEFAULTCONTEXT, TheListener.SPECIFICID, listener2);
+      Messenger.addSubscription(TheListener.SPECIFICID, listener2);
       Messenger.removeSubscription(TheListener.SPECIFICID, listener2);
       Messenger.removeSubscription(null, listener2);
       Messenger.removeSubscription(TheListener.SPECIFICID, null);
@@ -134,27 +135,27 @@ public class HorizonSubscriptionTest
    @Test(dependsOnMethods = {"testUnregister"})
    public void testAddHorizonListener()
    {
-      Messenger.addHorizonListener(this, listener2);
+      Messenger.addListener(this, listener2);
       // re-add
-      Messenger.addHorizonListener(this, listener2);
+      Messenger.addListener(this, listener2);
    }
    
    @Test(dependsOnMethods = {"testAddHorizonListener"})
    public void testRemoveHorizonListener()
    {
-      Messenger.removeHorizonListener(this, listener2);
-      Messenger.removeHorizonListener(this, listener1);
-      Messenger.removeHorizonListener(listener1, this);
+      Messenger.removeListener(this, listener2);
+      Messenger.removeListener(this, listener1);
+      Messenger.removeListener(listener1, this);
 
    }
    
    @Test(dependsOnMethods = {"testRemoveHorizonListener"})
    public void testSendMessage()
    {
-      Message message = new Message(Messenger.DEFAULTCONTEXT,this, listener2, TheListener.SPECIFICID, "Test", false);
+      Message message = new Message(this, listener2, TheListener.SPECIFICID, "Test", false);
       message.setConfidential(true);
       Messenger.sendMessage(message);
-      Messenger.sendMessage(new Message(Messenger.DEFAULTCONTEXT, this, listener2, TheListener.SPECIFICID, "Test", false));
+      Messenger.sendMessage(new Message(this, listener2, TheListener.SPECIFICID, "Test", false));
       Messenger.sendConfidentialMessage(this, listener2, TheListener.SPECIFICID, "Test");
       Messenger.sendMessage(this, TheListener.SPECIFICID, "Test");
    }
@@ -163,16 +164,16 @@ public class HorizonSubscriptionTest
    public void testSendSynchronousMessage()
    {
       Messenger.sendSynchronousMessage(this, listener2, TheListener.SPECIFICID, "Test", false);
-      Messenger.sendSynchronousMessage(new Message(Messenger.DEFAULTCONTEXT, this, listener2, TheListener.SPECIFICID, "Test", true));
+      Messenger.sendSynchronousMessage(new Message(this, listener2, TheListener.SPECIFICID, "Test", true));
       Messenger.sendSynchronousMessage(this, TheListener.SPECIFICID, "Test");
    }
    
    @Test(dependsOnMethods = {"testSendSynchronousMessage"})
    public void testRemoveAllHorizonListener()
    {
-      Messenger.removeAllHorizonListeners(listener2);
-      Messenger.removeAllHorizonListeners(this);
-      Messenger.removeAllHorizonListeners(null);
+      Messenger.removeAllListeners(listener2);
+      Messenger.removeAllListeners(this);
+      Messenger.removeAllListeners(null);
    }
    
    @Test(dependsOnMethods = {"testSendSynchronousMessage"})
@@ -194,7 +195,7 @@ public class HorizonSubscriptionTest
    @Test(dependsOnMethods = {"testUnregisterAllMessages"})
    public void testRemoveUnregistered()
    {
-      Messenger.removeSubscription(Messenger.DEFAULTCONTEXT, "DontCare");
+      Messenger.removeSubscription("DontCare", null);
    }
    
    @Test(dependsOnMethods = {"testRemoveUnregistered"})

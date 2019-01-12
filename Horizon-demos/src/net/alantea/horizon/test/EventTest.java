@@ -1,19 +1,23 @@
 package net.alantea.horizon.test;
 
 import net.alantea.horizon.message.Receive;
+import net.alantea.horizon.message.internal.ListenerManager;
+import net.alantea.horizon.message.internal.RegisterManager;
+import net.alantea.horizon.message.internal.SendingManager;
 import net.alantea.horizon.message.Message;
 import net.alantea.horizon.message.Messenger;
+import net.alantea.horizon.message.Mode;
 
 public class EventTest
 {
    public static void main(String[] args)
    {
-      Messenger.setMode(net.alantea.horizon.message.internal.SendingManager.Mode.SYNCHRONOUS);
+      SendingManager.setMode(Mode.SYNCHRONOUS);
       TheSource source = new TheSource();
-      Messenger.addHorizonListener(source, new ListenerOne("One"));
-      Messenger.addHorizonListener(source, new ListenerOne("Two"));
+      ListenerManager.addHorizonListener(source, new ListenerOne("One"));
+      ListenerManager.addHorizonListener(source, new ListenerOne("Two"));
       ListenerTwo l3 = new ListenerTwo("Three");
-      Messenger.register(l3);
+      RegisterManager.register(l3);
       source.sendIt1();
       source.sendIt2();
    }

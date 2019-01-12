@@ -1,15 +1,10 @@
 package net.alantea.horizon.message;
 
-public interface MessageSubscriber
+import net.alantea.horizon.message.internal.RegisterManager;
+import net.alantea.horizon.message.internal.SubscriptionManager;
+
+public interface MessageSubscriber extends MessageTarget
 {
-   
-   /**
-    * On message reception.
-    *
-    * @param message the message
-    */
-   public void onMessage(Message message);
-   
    /**
     * Register to a message type. Please consider it carefully before overriding !
     *
@@ -17,7 +12,7 @@ public interface MessageSubscriber
     */
    public default void register(String id)
    {
-      Messenger.register(id, this);
+      RegisterManager.register(id, this);
    }
    
    /**
@@ -28,7 +23,7 @@ public interface MessageSubscriber
     */
    public default void register(String id, Object context)
    {
-      Messenger.addSubscription(context, id, this);
+      SubscriptionManager.addSubscription(context, id, this);
    }
    
    /**
@@ -38,7 +33,7 @@ public interface MessageSubscriber
     */
    public default void unregister(String id)
    {
-      Messenger.unregister(id, this);
+      RegisterManager.unregister(id, this);
    }
    
    /**
@@ -49,6 +44,6 @@ public interface MessageSubscriber
     */
    public default void unregister(String id, Object context)
    {
-      Messenger.removeSubscription(context, id, this);
+      SubscriptionManager.removeSubscription(context, id, this);
    }
 }

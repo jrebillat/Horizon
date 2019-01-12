@@ -2,7 +2,8 @@ package net.alantea.horizon.demos.simple;
 
 import net.alantea.horizon.message.Message;
 import net.alantea.horizon.message.Messenger;
-import net.alantea.horizon.message.internal.SendingManager.Mode;
+import net.alantea.horizon.message.Mode;
+import net.alantea.horizon.message.internal.RegisterManager;
 
 /**
  * Simple basic messaging demonstration. The Listener instance is waiting for a message (any kind of message)
@@ -23,7 +24,7 @@ public class BasicDemo
       
       // Create and register listener
       Listener listener = new Listener();
-      Messenger.register(listener);
+      RegisterManager.register(listener);
       
       // Send a message
       Messenger.sendMessage(null, "SimpleTest", "Simple content");

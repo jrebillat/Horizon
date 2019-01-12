@@ -1,5 +1,7 @@
 package net.alantea.horizon.message;
 
+import net.alantea.horizon.message.internal.SubscriptionManager;
+
 /**
  * The Message class.
  */
@@ -32,7 +34,7 @@ public class Message
     */
    public Message(String id, Object content)
    {
-      this(Messenger.DEFAULTCONTEXT, "", null, id, content, false);
+      this(SubscriptionManager.DEFAULTCONTEXT, "", null, id, content, false);
    }
    
    /**
@@ -44,7 +46,7 @@ public class Message
     */
    public Message(Object sender, String id, Object content)
    {
-      this(Messenger.DEFAULTCONTEXT, sender, null, id, content, false);
+      this(SubscriptionManager.DEFAULTCONTEXT, sender, null, id, content, false);
    }
    
    /**
@@ -58,7 +60,7 @@ public class Message
     */
    public Message(Object sender, Object receiver, String id, Object content, boolean conf)
    {
-      this(Messenger.DEFAULTCONTEXT, sender, receiver, id, content, conf);
+      this(SubscriptionManager.DEFAULTCONTEXT, sender, receiver, id, content, conf);
    }
    
    /**

@@ -1,5 +1,7 @@
 package net.alantea.horizon.message;
 
+import net.alantea.horizon.message.internal.ListenerManager;
+
 /**
  * The Interface MessageSource. Please do not try to override default methods !
  */
@@ -68,7 +70,7 @@ public interface MessageSource
     */
    public default void addHorizonListener(Object listener)
    {
-      Messenger.addHorizonListener(this, listener);
+      ListenerManager.addHorizonListener(this, listener);
    }
    
    /**
@@ -78,6 +80,6 @@ public interface MessageSource
     */
    public default void removeHorizonListener(Object listener)
    {
-      Messenger.removeHorizonListener(this, listener);
+      ListenerManager.removeHorizonListener(this, listener);
    }
 }

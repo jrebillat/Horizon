@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.alantea.horizon.message.Receive;
+import net.alantea.horizon.message.Receives;
 import net.alantea.horizon.message.Message;
 
 /**
@@ -25,8 +26,72 @@ public class MethodsManager
    protected static final String DEFAULTID = "";
 
    /** The listener classes map. A map < listening class class, map <Message identifier, map <waited content, target method>>>*/
-   private static Map<Class<? extends Object>, Map<String, Map<Class<?>, Method>>> classesmap = new ConcurrentHashMap<>();
+   private static Map<Class<? extends Object>, Map<String, Map<Class<?>, Method>>> instanceClassesmap = new ConcurrentHashMap<>();
+   
+   /** The listener classes map. A map < listening class class, map <Message identifier, map <waited content, target method>>>*/
+   private static Map<Class<? extends Object>, Map<String, Map<Class<?>, Method>>> staticClassesmap = new ConcurrentHashMap<>();
 
+   /**
+    * Gets the method listening to identifier with the correct parameter.
+    *
+    * @param managedClass the managed class to parse
+    * @param identifier the identifier searched for
+    * @param parameter the parameter to search for
+    * @return the method found or null
+    */
+   public static final Method getStaticMethod(Class<?> managedClass, String identifier, Class<?> parameter)
+   {
+      if ((managedClass == null) || (identifier == null))
+      {
+         return null;
+      }
+      return getMethodRecursively(managedClass, identifier, parameter, true);
+   }
+
+   /**
+    * Gets the method listening to identifier with the correct parameter.
+    *
+    * @param managedClass the managed class to parse
+    * @param identifier the identifier searched for
+    * @param parameter the parameter to search for
+    * @return the method found or null
+    */
+   public static final Method getMethod(Class<?> managedClass, String identifier, Class<?> parameter)
+   {
+      if ((managedClass == null) || (identifier == null))
+      {
+         return null;
+      }
+      return getMethodRecursively(managedClass, identifier, parameter, false);
+   }
+
+   /**
+    * Parses all methods for a class, to organize them and add them in the global class map.
+    *
+    * @param managedClass the class
+    * @return the methods
+    */
+   public static final Map<String, Map<Class<?>, Method>> getMethods(Class<?> managedClass)
+   {
+      // get methods map for class
+      Map<String, Map<Class<?>, Method>> methodmap = getSubMethodMap(managedClass, false);
+      return methodmap;
+   }
+
+   /**
+    * Parses all methods for a class, to organize them and add them in the global class map.
+    *
+    * @param managedClass the class
+    * @return the methods
+    */
+   public static final Map<String, Map<Class<?>, Method>> getStaticMethods(Class<?> managedClass)
+   {
+      // get methods map for class
+      Map<String, Map<Class<?>, Method>> methodmap = getSubMethodMap(managedClass, true);
+      return methodmap;
+   }
+   
+   //-----------------------------------------------------------------------------------------------------------
    /**
     * Gets the method recursively.
     *
@@ -35,7 +100,7 @@ public class MethodsManager
     * @param parameter the parameter
     * @return the method recursively
     */
-   private static Method getMethodRecursively(Class<?> managedClass, String identifier, Class<?> parameter)
+   private static Method getMethodRecursively(Class<?> managedClass, String identifier, Class<?> parameter, boolean staticFlag)
    {
       // get the map for methods in class.
       Map<String, Map<Class<?>, Method>> map = getMethods(managedClass);
@@ -46,7 +111,7 @@ public class MethodsManager
       // If nothing is found, analyse more the class.
       if ((meths == null) && (!DEFAULTID.equals(identifier)))
       {
-         return getMethodRecursively(managedClass, DEFAULTID, parameter);
+         return getMethodRecursively(managedClass, DEFAULTID, parameter, staticFlag);
       }
 
       // Analyze parameter type for each method, to get the best match.
@@ -88,7 +153,7 @@ public class MethodsManager
                while ((ret == null) && (i < itfs.length) && ((!itfs[i].equals(Object.class))))
                {
                   // TODO why not use 'ret = meths.get(itfs[i]);' ???
-                  ret = getMethodRecursively(managedClass, identifier, itfs[i]);
+                  ret = getMethodRecursively(managedClass, identifier, itfs[i], staticFlag);
                   i++;
                }
                superparam = superparam.getSuperclass();
@@ -99,41 +164,9 @@ public class MethodsManager
       // If nothing has been found so far, search for 'default' method for identifier, the one with a Message as parameter.
       if ((ret == null) && (!parameter.equals(Message.class)))
       {
-         ret = getMethodRecursively(managedClass, identifier, Message.class);
+         ret = getMethodRecursively(managedClass, identifier, Message.class, staticFlag);
       }
       return ret;
-   }
-
-   /**
-    * Gets the method listening to identifier with the correct parameter.
-    *
-    * @param managedClass the managed class to parse
-    * @param identifier the identifier searched for
-    * @param parameter the parameter to search for
-    * @return the method found or null
-    */
-   protected static final Method getMethod(Class<?> managedClass, String identifier, Class<?> parameter)
-   {
-      if ((managedClass == null) || (identifier == null))
-      {
-         return null;
-      }
-      return getMethodRecursively(managedClass, identifier, parameter);
-   }
-
-   /**
-    * Parses all methods for a class, to organize them and add them in the global class map.
-    *
-    * @param managedClass the class
-    * @return the methods
-    */
-   protected static final Map<String, Map<Class<?>, Method>> getMethods(Class<?> managedClass)
-   {
-      // get methods map for class
-      Map<String, Map<Class<?>, Method>> methodmap = getSubMethodMap(managedClass);
-      // Add them to global class map
-      classesmap.put(managedClass, methodmap);
-      return methodmap;
    }
 
    /**
@@ -142,7 +175,7 @@ public class MethodsManager
     * @param managedClass the class to map
     * @return the sub method map
     */
-   private static Map<String, Map<Class<?>, Method>> getSubMethodMap(Class<?> managedClass)
+   private static Map<String, Map<Class<?>, Method>> getSubMethodMap(Class<?> managedClass, boolean staticFlag)
    {
       // Test silly call
       if (managedClass == null)
@@ -151,7 +184,7 @@ public class MethodsManager
       }
 
       // Test if we already have done the work.
-      Map<String, Map<Class<?>, Method>> methodmap = classesmap.get(managedClass);
+      Map<String, Map<Class<?>, Method>> methodmap = (staticFlag) ? staticClassesmap.get(managedClass) : instanceClassesmap.get(managedClass);
       if (methodmap != null)
       {
          return methodmap;
@@ -159,13 +192,22 @@ public class MethodsManager
 
       // Search for compatible methods in interfaces (for default methods) and superclass.
       methodmap = new ConcurrentHashMap<>();
+      if (staticFlag)
+      {
+         staticClassesmap.put(managedClass, methodmap);
+      }
+      else
+      {
+         instanceClassesmap.put(managedClass, methodmap);
+      }
+      
       if (!managedClass.equals(Object.class))
       {
          for (Class<?> class1 : managedClass.getInterfaces())
          {
-            methodmap.putAll(copyMethodsMap(class1));
+            methodmap.putAll(copyMethodsMap(class1, staticFlag));
          }
-         methodmap.putAll(copyMethodsMap(managedClass.getSuperclass()));
+         methodmap.putAll(copyMethodsMap(managedClass.getSuperclass(), staticFlag));
       }
 
       // Get methods declared in class itself
@@ -176,18 +218,15 @@ public class MethodsManager
          if (method.getParameterCount() == 1)
          {
             String name = method.getName();
-            // If the method is annoted with @Listen and analyse Listen annotation
-            if (method.isAnnotationPresent(Receive.class))
+            // If the method is annoted with @Receive and analyse Receive annotation
+            if ((method.isAnnotationPresent(Receive.class)) || (method.isAnnotationPresent(Receives.class)))
             {
                Receive[] annotations = method.getAnnotationsByType(Receive.class);
                for (Receive annotation : annotations)
                {
-                  // Only search if not the default identifier in message field
-                  if (!DEFAULTID.equals(annotation.message()))
-                  {
-                     // Yep, that's one ! Register in map.
-                     registerListeningMethod(annotation.message(), method, methodmap);
-                  }
+                  // TODO ?????
+                  // Yep, that's one ! Register in map.
+                  registerListeningMethod(annotation.message(), method, methodmap);
                   // Search for all identifiers listed in messages
                   for( String id : annotation.messages())
                   {
@@ -212,12 +251,12 @@ public class MethodsManager
     * @param subclass the sub class to copy method map from
     * @return the map
     */
-   private static Map<String, Map<Class<?>, Method>> copyMethodsMap(Class<?> subclass)
+   private static Map<String, Map<Class<?>, Method>> copyMethodsMap(Class<?> subclass, boolean staticFlag)
    {
       Map<String, Map<Class<?>, Method>> methodmap = new HashMap<>();
       
       // Warning : copy content, do not just link to it.
-      Map<String, Map<Class<?>, Method>> supermap = getSubMethodMap(subclass);
+      Map<String, Map<Class<?>, Method>> supermap = getSubMethodMap(subclass, staticFlag);
       for(String key : supermap.keySet())
       {
          Map<Class<?>, Method> submap = supermap.get(key);
