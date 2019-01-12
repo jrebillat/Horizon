@@ -3,7 +3,7 @@ package net.alantea.horizon.message.internal;
 import net.alantea.horizon.message.Message;
 import net.alantea.liteprops.Property;
 
-public class PropertyMonitor extends SendingManager
+public class PropertyMonitor
 {
    
    /** Monitor a liteprops property. Each change on property will trigger the given message type.
@@ -13,7 +13,7 @@ public class PropertyMonitor extends SendingManager
     */
    public static final void monitorProperty(Property<?> property, String identifier)
    {
-      monitorProperty(DEFAULTCONTEXT, property, identifier, (String)null);
+      monitorProperty(SubscriptionManager.DEFAULTCONTEXT, property, identifier, (String)null);
    }
    
    /**
@@ -26,7 +26,7 @@ public class PropertyMonitor extends SendingManager
     */
    public static final void monitorProperty(Property<?> property, String getIdentifier, String setIdentifier)
    {
-      monitorProperty(DEFAULTCONTEXT, property, getIdentifier, setIdentifier);
+      monitorProperty(SubscriptionManager.DEFAULTCONTEXT, property, getIdentifier, setIdentifier);
    }
    
    /**
@@ -43,13 +43,13 @@ public class PropertyMonitor extends SendingManager
       if (getIdentifier != null)
       {
          property.addListener((o, n) -> { 
-            internalSendMessage(new Message(context, property, null, getIdentifier, n, false)); });
+            SendingManager.internalSendMessage(new Message(context, property, null, getIdentifier, n, false)); });
       }
       
       if ((setIdentifier != null) && (property instanceof Property))
       {
          PropertyMonitorWrapper wrapper = new PropertyMonitorWrapper((Property<?>) property);
-         addSubscription(context, setIdentifier, wrapper);
+         SubscriptionManager.addSubscription(context, setIdentifier, wrapper);
       }
    }
 }

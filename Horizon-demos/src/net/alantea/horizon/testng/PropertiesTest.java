@@ -3,10 +3,10 @@ package net.alantea.horizon.testng;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import net.alantea.horizon.message.Messenger;
+import net.alantea.horizon.message.Mode;
 import net.alantea.horizon.testng.model.TheListener;
+import net.alantea.liteprops.StringProperty;
 
 public class PropertiesTest
 {
@@ -15,13 +15,13 @@ public class PropertiesTest
    private TheListener listener1 = new TheListener("One");
    private TheListener listener2 = new TheListener("Two");
    
-   private StringProperty property1 = new SimpleStringProperty();
-   private StringProperty property2 = new SimpleStringProperty();
+   private StringProperty property1 = new StringProperty();
+   private StringProperty property2 = new StringProperty();
    
    @Test
    public void testSetInitial()
    {
-      Messenger.setMode(Messenger.Mode.SYNCHRONOUS);
+      Messenger.setMode(Mode.SYNCHRONOUS);
       Messenger.register(listener1);
       Messenger.register(CONTEXT2, listener2);
    }

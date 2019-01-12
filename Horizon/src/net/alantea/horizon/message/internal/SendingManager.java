@@ -5,26 +5,16 @@ import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.alantea.horizon.message.Message;
+import net.alantea.horizon.message.Mode;
 
 /**
  * The Class SendingManager. Deals with management of sending messages
  */
-public class SendingManager extends RegisterManager
+public class SendingManager
 {
    /**
     * The Mode enum. Select mode of transmission. By default, the mode is preset (see mode field).
     */
-   public enum Mode
-   {
-      /** A thread is used to deliver messages in order they are generated. */
-      THREADED,
-      /** A thread is used to thread messages (one thread generating one thread per message). */
-      HYPERTHREADED,
-      /** Messages are threaded in order (one thread per message) from the main thread. */
-      CONCURRENT,
-      /** Messages are processed in order from the main thread. */
-      SYNCHRONOUS
-   };
 
    /** The Constant DEFAULTINTERVAL. */
    private static final int DEFAULTINTERVAL = 250;
@@ -79,28 +69,28 @@ public class SendingManager extends RegisterManager
       
       // TODO : differenciate register and subscribe
       // Get context
-      Object context = (message.getContext() == null) ? DEFAULTCONTEXT : message.getContext();
+      Object context = (message.getContext() == null) ? SubscriptionManager.DEFAULTCONTEXT : message.getContext();
       
       // Send to listeners
-      for (Object target : getListeners(message.getSender()))
+      for (Object target : ListenerManager.getListeners(message.getSender()))
       {
          sendMessageToReceiver(message, target);
       }
       
       // Send to subscribers
-      for (Object target : getSubscribers(context, message.getIdentifier()))
+      for (Object target : SubscriptionManager.getSubscribers(context, message.getIdentifier()))
       {
          sendMessageToReceiver(message, target);
       }
       
       // Send to registered
-      for (Object target : getRegistered(context))
+      for (Object target : RegisterManager.getRegistered(context))
       {
          sendMessageToReceiver(message, target);
       }
       
       // Send to catch all list
-      for (Object target : getCatchAllList())
+      for (Object target : RegisterManager.getCatchAllList())
       {
          sendMessageToReceiver(message, target);
       }
@@ -115,7 +105,7 @@ public class SendingManager extends RegisterManager
    private static void sendMessageToReceiver(Message message, Object receiver)
    {
       // get method to use
-      Method method = getMethod(receiver.getClass(), message.getIdentifier(), message.getContent().getClass());
+      Method method = MethodsManager.getMethod(receiver.getClass(), message.getIdentifier(), message.getContent().getClass());
 
       if (method != null)
       {
@@ -209,7 +199,7 @@ public class SendingManager extends RegisterManager
     *
     * @param message the message
     */
-   protected static void sendSingleMessage(Message message)
+   public static void sendSingleMessage(Message message)
    {
       // Silly call
       if (message == null)
@@ -236,7 +226,7 @@ public class SendingManager extends RegisterManager
     *
     * @param message the message
     */
-   protected synchronized static final void internalSendMessage(Message message)
+   public synchronized static final void internalSendMessage(Message message)
    {
       // Silly call
       if ((message == null))

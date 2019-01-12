@@ -7,6 +7,7 @@ import net.alantea.horizon.message.Message;
 import net.alantea.horizon.message.MessageSource;
 import net.alantea.horizon.message.MessageSubscriber;
 import net.alantea.horizon.message.Messenger;
+import net.alantea.horizon.message.Mode;
 import net.alantea.horizon.testng.model.TheListener;
 
 public class SimpleMessageExchangeTest implements MessageSource, MessageSubscriber
@@ -17,7 +18,7 @@ public class SimpleMessageExchangeTest implements MessageSource, MessageSubscrib
    @Test
    public void testSetMode()
    {
-      Messenger.setMode(Messenger.Mode.SYNCHRONOUS);
+      Messenger.setMode(Mode.SYNCHRONOUS);
    }
    
    @Test
@@ -36,7 +37,7 @@ public class SimpleMessageExchangeTest implements MessageSource, MessageSubscrib
       Assert.assertEquals(listener2.getId(), TheListener.FIRSTID);
       Assert.assertEquals(listener2.getContent(), Math.PI);
 
-      Message message = new Message(Messenger.DEFAULTCONTEXT, this, listener2, TheListener.SPECIFICID, "Test", false);
+      Message message = new Message(this, listener2, TheListener.SPECIFICID, "Test", false);
       sendMessage(message);
       Assert.assertTrue(listener2.isSpecific());
       Assert.assertFalse(listener2.isSpecial());
@@ -55,7 +56,7 @@ public class SimpleMessageExchangeTest implements MessageSource, MessageSubscrib
       Assert.assertEquals(listener2.getId(), TheListener.FIRSTID);
       Assert.assertEquals(listener2.getContent(), Math.PI);
 
-      Message message = new Message(Messenger.DEFAULTCONTEXT, this, listener2, TheListener.SPECIFICID, "Test", false);
+      Message message = new Message(this, listener2, TheListener.SPECIFICID, "Test", false);
       sendMessage(message);
       Assert.assertTrue(listener2.isSpecific());
       Assert.assertFalse(listener2.isSpecial());

@@ -9,7 +9,7 @@ import java.util.Map;
  * The Class SubscriptionManager, to manage objects that subscribe to one or several identifiers in one or several contexts.
  * It contains the methods to manage the subscription process for identifiers and contexts.
  */
-public class SubscriptionManager extends ListenerManager
+public class SubscriptionManager
 {
 
    /** The default context constant. */
@@ -147,7 +147,7 @@ public class SubscriptionManager extends ListenerManager
     */
    protected static List<Object> getSubscribers(Object context, String identifier)
    {
-      List<Object> ret = EMPTYLIST;
+      List<Object> ret = ListenerManager.EMPTYLIST;
       
       if (identifier != null)
       {
@@ -162,6 +162,10 @@ public class SubscriptionManager extends ListenerManager
          {
             // get list of subscribers in the given context
             ret = contextMap.get(realContext);
+         }
+         else
+         {
+            ret = ListenerManager.EMPTYLIST;
          }
       }
 

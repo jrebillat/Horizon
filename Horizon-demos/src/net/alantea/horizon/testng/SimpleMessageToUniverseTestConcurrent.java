@@ -3,6 +3,7 @@ package net.alantea.horizon.testng;
 import org.testng.annotations.Test;
 
 import net.alantea.horizon.message.Messenger;
+import net.alantea.horizon.message.Mode;
 import net.alantea.horizon.testng.model.TheListener;
 
 public class SimpleMessageToUniverseTestConcurrent
@@ -13,7 +14,7 @@ public class SimpleMessageToUniverseTestConcurrent
    @Test
    public void testSetMode()
    {
-      Messenger.setMode(Messenger.Mode.CONCURRENT);
+      Messenger.setMode(Mode.CONCURRENT);
    }
    
    @Test

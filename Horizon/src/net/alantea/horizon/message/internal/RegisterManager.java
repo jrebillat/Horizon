@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * The Class RegisterManager. It deals with objects registering to events (all identifiers) in contexts, or for all the application.
  */
-public class RegisterManager extends SubscriptionManager
+public class RegisterManager
 {
    /** The 'registered to all events' list. */
    private static List<Object> catchAllList = new ArrayList<>();
@@ -26,7 +26,7 @@ public class RegisterManager extends SubscriptionManager
     */
    public static final void register(Object object)
    {
-      register(DEFAULTCONTEXT, object);
+      register(SubscriptionManager.DEFAULTCONTEXT, object);
    }
    
    /**
@@ -57,7 +57,7 @@ public class RegisterManager extends SubscriptionManager
       }
       
       // Calculate context (in case of NULL context given).
-      Object realContext = (context == null) ? DEFAULTCONTEXT : context;
+      Object realContext = (context == null) ? SubscriptionManager.DEFAULTCONTEXT : context;
       
       List<Object> registered = registeredmap.get(realContext);
       if (registered == null)
@@ -95,7 +95,7 @@ public class RegisterManager extends SubscriptionManager
     */
    public static final void unregister(Object object)
    {
-      unregister(DEFAULTID, object);
+      unregister(MethodsManager.DEFAULTID, object);
    }
 
    /**
@@ -113,7 +113,7 @@ public class RegisterManager extends SubscriptionManager
       }
       
       // Calculate context (in case of NULL context given).
-      Object realContext = (context == null) ? DEFAULTCONTEXT : context;
+      Object realContext = (context == null) ? SubscriptionManager.DEFAULTCONTEXT : context;
       
       List<Object> registered = registeredmap.get(realContext);
       if (registered == null)
@@ -152,7 +152,7 @@ public class RegisterManager extends SubscriptionManager
    protected static List<Object> getRegistered(Object context)
    {
       // Calculate context (in case of NULL context given).
-      Object realContext = (context == null) ? DEFAULTCONTEXT : context;
+      Object realContext = (context == null) ? SubscriptionManager.DEFAULTCONTEXT : context;
       
       List<Object> registered = registeredmap.get(realContext);
       if (registered == null)
