@@ -94,6 +94,19 @@ public final class Messenger extends PropertyMonitor
    {
       sendMessage(sender, receiver, id, content, true);
    }
+   
+   /**
+    * Send simple message to the world.
+    *
+    * @param sender the sender
+    * @param id the id
+    * @param content the content
+    */
+   public static final void sendMessage(Object sender, String id)
+   {
+      sendMessage(SubscriptionManager.DEFAULTCONTEXT, sender, null, id, "", false);
+   }
+   
    /**
     * Send message to the world.
     *
