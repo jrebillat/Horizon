@@ -100,7 +100,6 @@ public final class Messenger extends PropertyMonitor
     *
     * @param sender the sender
     * @param id the id
-    * @param content the content
     */
    public static final void sendMessage(Object sender, String id)
    {
@@ -286,6 +285,7 @@ public final class Messenger extends PropertyMonitor
     * Listen.
     *
     * @param object the object
+    * @param listener the listener
     */
    public static void addListener(Object object, Object listener)
    {

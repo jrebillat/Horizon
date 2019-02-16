@@ -10,5 +10,7 @@ public interface MessageTarget
    
    /**
     * On message.
+    *
+    * @param message the message
     */
    public void onMessage(Message message);}
