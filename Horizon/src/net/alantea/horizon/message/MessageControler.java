@@ -10,10 +10,4 @@ import java.lang.annotation.Target;
 @Target(TYPE)
 public @interface MessageControler
 {
-   /**
-    * Value.
-    *
-    * @return the string
-    */
-   String value() default "";
 }

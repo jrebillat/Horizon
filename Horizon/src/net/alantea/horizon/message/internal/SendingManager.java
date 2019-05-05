@@ -104,6 +104,51 @@ public class SendingManager
     */
    private static void sendMessageToReceiver(Message message, Object receiver)
    {
+      if (receiver instanceof Class)
+      {
+         sendMessageToClassReceiver(message, (Class<?>) receiver);
+      }
+      else
+      {
+         sendMessageToObjectReceiver(message, receiver);
+      }
+   }
+
+   /**
+    * Send message to a receiver class.
+    *
+    * @param message the message
+    * @param receiver the receiver
+    */
+   private static void sendMessageToClassReceiver(Message message, Class<?> receiver)
+   {
+      // get method to use
+      Method method = MethodsManager.getStaticMethod(receiver, message.getIdentifier(), message.getContent().getClass());
+
+      if (method != null)
+      {
+         if (mode == Mode.CONCURRENT || mode == Mode.HYPERTHREADED)
+         {
+            // Create a thread to launch the call
+            final Method theMethod = method;
+            new Thread(() -> sendToMethod(theMethod, null, message)).start();
+         }
+         else
+         {
+            // directly send
+            sendToMethod(method, receiver, message);
+         }
+      }
+   }
+
+   /**
+    * Send message to a receiver object.
+    *
+    * @param message the message
+    * @param receiver the receiver
+    */
+   private static void sendMessageToObjectReceiver(Message message, Object receiver)
+   {
       // get method to use
       Method method = MethodsManager.getMethod(receiver.getClass(), message.getIdentifier(), message.getContent().getClass());
 

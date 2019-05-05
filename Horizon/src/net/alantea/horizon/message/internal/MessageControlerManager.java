@@ -10,9 +10,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.alantea.horizon.message.Message;
-import net.alantea.horizon.message.MessageAction;
 import net.alantea.horizon.message.MessageControler;
 import net.alantea.horizon.message.MessageSubscriber;
+import net.alantea.horizon.message.Receive;
 import net.alantea.tools.scan.Scanner;
 
 /**
@@ -29,46 +29,26 @@ public class MessageControlerManager extends PropertyMonitor
          try
          {
             Class<?> cl = ClassLoader.getSystemClassLoader().loadClass(className);
-            String classInjectionName = cl.getSimpleName();
-            if (cl.getAnnotation(MessageControler.class) != null)
-            {
-               classInjectionName = (!cl.getAnnotation(MessageControler.class).value().equals(""))
-                     ? cl.getAnnotation(MessageControler.class).value() : cl.getSimpleName();
-            }
             
             // Search in methods
+            List<String> events = new LinkedList<>();
             for (Method method : cl.getDeclaredMethods())
             {
-               if ((method.getAnnotation(MessageAction.class) != null) 
+               if ((method.getAnnotation(Receive.class) != null) 
                      && (Modifier.isStatic(method.getModifiers()))
-                     && (method.getParameterCount() == 1)
-                     && (method.getParameterTypes()[0].isAssignableFrom(Message.class)))
+                     && (method.getParameterCount() == 1))
                {
-                  method.setAccessible(true);
-                  MessageSubscriber subscriber = new MessageSubscriber() 
+                  String injectionName = method.getAnnotation(Receive.class).message();
+                  if (!events.contains(injectionName))
                   {
-                     @Override
-                     public void onMessage(Message message)
-                     {
-                        try
-                        {
-                           method.invoke(null, message);
-                        }
-                        catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
-                        {
-                           // silently ignore it
-                        }
-                     }
-                  };
-                  String methodInjectionName = method.getName();
-                  if (method.getAnnotation(MessageAction.class) != null)
-                  {
-                     methodInjectionName = (!method.getAnnotation(MessageAction.class).value().equals(""))
-                           ? method.getAnnotation(MessageAction.class).value() : method.getName();
+                     events.add(injectionName);
                   }
-                  String injectionName = classInjectionName + "::" + methodInjectionName;
-                  subscriber.subscribe(injectionName);
                }
+            }
+            
+            for (String event : events)
+            {
+               SubscriptionManager.addSubscription(event, cl);
             }
          }
          catch (ClassNotFoundException e)

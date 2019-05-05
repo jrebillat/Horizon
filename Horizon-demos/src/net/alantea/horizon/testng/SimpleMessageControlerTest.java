@@ -16,25 +16,41 @@ public class SimpleMessageControlerTest
       Messenger.setMode(Mode.SYNCHRONOUS);
       Assert.assertFalse(TheControler.isCalled());
       Assert.assertFalse(TheControler.isMe());
+      Assert.assertTrue(TheControler.getWhat() == 0.0);
       
       Messenger.sendMessage(this, null, TheListener.FIRSTID, 666, false);
       Assert.assertFalse(TheControler.isCalled());      
       Assert.assertFalse(TheControler.isMe());
+      Assert.assertTrue(TheControler.getWhat() == 0.0);
       
       Messenger.sendMessage(this, null, "TheControler::call", "You", false);
       Assert.assertTrue(TheControler.isCalled());
       Assert.assertFalse(TheControler.isMe());
+      Assert.assertTrue(TheControler.getWhat() == 0.0);
       
       Messenger.sendMessage(this, null, "TheControler::call", "Me", false);
       Assert.assertTrue(TheControler.isCalled());
       Assert.assertTrue(TheControler.isMe());
+      Assert.assertTrue(TheControler.getWhat() == 0.0);
+      
+      Messenger.sendMessage(this, null, "TheControler::call", "Me", false);
+      Assert.assertTrue(TheControler.isCalled());
+      Assert.assertTrue(TheControler.isMe());
+      Assert.assertTrue(TheControler.getWhat() == 0.0);
       
       Messenger.sendMessage(this, null, TheListener.FIRSTID, 666, false);
       Assert.assertTrue(TheControler.isCalled());
       Assert.assertTrue(TheControler.isMe());
+      Assert.assertTrue(TheControler.getWhat() == 0.0);
+      
+      Messenger.sendMessage(this, null, "TheControler::call", 3.14, false);
+      Assert.assertFalse(TheControler.isCalled());
+      Assert.assertFalse(TheControler.isMe());
+      Assert.assertTrue(TheControler.getWhat() == 3.14);
       
       Messenger.sendMessage(this, null, "TheControler::call", "You", false);
       Assert.assertTrue(TheControler.isCalled());
       Assert.assertFalse(TheControler.isMe());
+      Assert.assertTrue(TheControler.getWhat() == 0.0);
    }
 }
