@@ -90,7 +90,7 @@ public class SendingManager
       }
       
       // Send to catch all list
-      for (Object target : RegisterManager.getCatchAllList())
+      for (Object target : RegisterManager.getCatchAllList().toArray())
       {
          sendMessageToReceiver(message, target);
       }

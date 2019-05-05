@@ -120,5 +120,10 @@
 			<artifactId>liteprops</artifactId>
 			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>net.alantea</groupId>
+			<artifactId>tools</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

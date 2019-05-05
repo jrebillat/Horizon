@@ -35,6 +35,7 @@ public class PropertiesTest
    @Test(dependsOnMethods = {"testSetMonitoring"})
    public void testSetContextValue()
    {
+      Messenger.monitorProperty(property2, TheListener.ANOTHERID);
       property2.set("Hello World");
       // verify listener2
       Assert.assertFalse(listener2.isSpecific());

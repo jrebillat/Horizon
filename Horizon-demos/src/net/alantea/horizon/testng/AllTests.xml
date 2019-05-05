@@ -16,6 +16,7 @@
        <class name="net.alantea.horizon.testng.SynchronousTest" />
        <class name="net.alantea.horizon.testng.ListenMessagesTest" />
        <class name="net.alantea.horizon.testng.PropertiesTest" />
+       <class name="net.alantea.horizon.testng.SimpleMessageControlerTest" />
     </classes>
   </test>
   

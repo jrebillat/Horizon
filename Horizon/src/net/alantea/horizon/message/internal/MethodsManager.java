@@ -226,7 +226,10 @@ public class MethodsManager
                {
                   // TODO ?????
                   // Yep, that's one ! Register in map.
-                  registerListeningMethod(annotation.message(), method, methodmap);
+                  if (!("".equals(annotation.message())) || (annotation.messages().length == 0))
+                  {
+                     registerListeningMethod(annotation.message(), method, methodmap);
+                  }
                   // Search for all identifiers listed in messages
                   for( String id : annotation.messages())
                   {

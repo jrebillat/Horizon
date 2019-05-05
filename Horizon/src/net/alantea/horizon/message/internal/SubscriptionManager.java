@@ -163,10 +163,10 @@ public class SubscriptionManager
             // get list of subscribers in the given context
             ret = contextMap.get(realContext);
          }
-         else
-         {
-            ret = ListenerManager.EMPTYLIST;
-         }
+      }
+      if (ret == null)
+      {
+         ret = ListenerManager.EMPTYLIST;
       }
 
       return ret;

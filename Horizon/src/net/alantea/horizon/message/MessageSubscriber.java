@@ -1,6 +1,5 @@
 package net.alantea.horizon.message;
 
-import net.alantea.horizon.message.internal.RegisterManager;
 import net.alantea.horizon.message.internal.SubscriptionManager;
 
 public interface MessageSubscriber extends MessageTarget
@@ -10,9 +9,9 @@ public interface MessageSubscriber extends MessageTarget
     *
     * @param id the id
     */
-   public default void register(String id)
+   public default void subscribe(String id)
    {
-      RegisterManager.register(id, this);
+      SubscriptionManager.addSubscription(id, this);
    }
    
    /**
@@ -21,28 +20,28 @@ public interface MessageSubscriber extends MessageTarget
     * @param id the id
     * @param context the context
     */
-   public default void register(String id, Object context)
+   public default void subscribe(String id, Object context)
    {
       SubscriptionManager.addSubscription(context, id, this);
    }
    
    /**
-    * Unregister to a message type. Please consider it carefully before overriding !
+    * Unsubscribe to a message type. Please consider it carefully before overriding !
     *
     * @param id the id
     */
-   public default void unregister(String id)
+   public default void unsubscribe(String id)
    {
-      RegisterManager.unregister(id, this);
+      SubscriptionManager.removeSubscription(id, this);
    }
    
    /**
-    * Unregister to a message type. Please consider it carefully before overriding !
+    * Unsubscribe to a message type. Please consider it carefully before overriding !
     *
     * @param id the id
     * @param context the context
     */
-   public default void unregister(String id, Object context)
+   public default void unsubscribe(String id, Object context)
    {
       SubscriptionManager.removeSubscription(context, id, this);
    }

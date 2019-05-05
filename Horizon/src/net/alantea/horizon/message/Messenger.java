@@ -1,6 +1,7 @@
 package net.alantea.horizon.message;
 
 import net.alantea.horizon.message.internal.ListenerManager;
+import net.alantea.horizon.message.internal.MessageControlerManager;
 import net.alantea.horizon.message.internal.PropertyMonitor;
 import net.alantea.horizon.message.internal.RegisterManager;
 import net.alantea.horizon.message.internal.SendingManager;
@@ -11,6 +12,11 @@ import net.alantea.horizon.message.internal.SubscriptionManager;
  */
 public final class Messenger extends PropertyMonitor
 {
+   
+   static
+   {
+      MessageControlerManager.initialize();
+   }
 
 
    /**
