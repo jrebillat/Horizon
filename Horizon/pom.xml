@@ -2,8 +2,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.alantea</groupId>
   <artifactId>horizon</artifactId>
-  <version>0.4.4-SNAPSHOT</version>
-  <name>Horizon</name>
+  <version>0.4.5-SNAPSHOT</version>
+  <name>${project.groupId}:${project.artifactId}</name>
   <packaging>jar</packaging>
   <description>Messenging system</description>
   <licenses>
@@ -86,7 +86,6 @@
 	  <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.7</version>
         <extensions>true</extensions>
         <configuration>
            <serverId>ossrh</serverId>
@@ -111,13 +110,13 @@
 	    <connection>scm:git:git@github.com:jrebillat/Horizon.git</connection>
 	    <url>scm:git:git@github.com:jrebillat/Horizon.git</url>
 	    <developerConnection>scm:git:git@github.com:jrebillat/Horizon.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>horizon-0.4.4</tag>
   </scm>
 	<dependencies>
 		<dependency>
 			<groupId>net.alantea</groupId>
 			<artifactId>tools</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.1</version>
 		</dependency>
 	</dependencies>
 </project>
