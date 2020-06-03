@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.alantea.horizon.message.FunctionalSubscription;
+
 
 /**
  * The Class ListenerManager. It contains the methods to manage the listening process for sources.
@@ -51,7 +53,10 @@ public class ListenerManager
             //Add listener if it is not already registered
             listeners.add(listener);
             // prepare list of methods for later use
-            MethodsManager.getMethods(listener.getClass());
+            if (!(listener instanceof FunctionalSubscription))
+            {
+               MethodsManager.getMethods(listener.getClass());
+            }
          }
       }
       return true;
@@ -143,6 +148,19 @@ public class ListenerManager
          // create empty list and add it to map.
          listeners = new ArrayList<>();
          listenermap.put(source, listeners);
+      }
+      
+      Class<?> theClass = source.getClass();
+      while (theClass != Object.class)
+      {
+         // get list of listeners for the class
+         List<Object> classListeners = listenermap.get(theClass);
+         if (classListeners != null)
+         {
+            // add it to list.
+            listeners.addAll(classListeners);
+         }
+         theClass = theClass.getSuperclass();
       }
       return listeners;
    }
