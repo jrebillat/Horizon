@@ -105,13 +105,13 @@ public class SendingManager
     */
    private static void sendMessageToReceiver(Message message, Object receiver)
    {
-      if (receiver instanceof Class)
-      {
-         sendMessageToClassReceiver(message, (Class<?>) receiver);
-      }
-      else if (receiver instanceof FunctionalSubscription)
+      if (receiver instanceof FunctionalSubscription)
       {
          sendMessageToFunctionalSubscriptionReceiver(message, (FunctionalSubscription)receiver);
+      }
+      else if (receiver instanceof Class)
+      {
+         sendMessageToClassReceiver(message, (Class<?>) receiver);
       }
       else
       {

@@ -279,7 +279,7 @@ public final class Messenger extends PropertyMonitor
     */
    public static final void addSubscription(Object context, String identifier, FunctionalSubscription subscriber)
    {
-      addSubscription(context, identifier, subscriber);
+      SubscriptionManager.addSubscription(context, identifier, subscriber);
    }
 
    /**
@@ -308,6 +308,17 @@ public final class Messenger extends PropertyMonitor
    public static final void removeSubscription(Object context, String identifier, Object subscriber)
    {
       SubscriptionManager.removeSubscription(context, identifier, subscriber);
+   }
+
+   /**
+    * Listen with a functional interface.
+    *
+    * @param object the object
+    * @param listener the listener
+    */
+   public static void addListener(Object object, FunctionalSubscription listener)
+   {
+      ListenerManager.addHorizonListener(object, listener);
    }
 
    /**
