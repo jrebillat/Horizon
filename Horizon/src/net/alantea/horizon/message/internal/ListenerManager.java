@@ -150,17 +150,20 @@ public class ListenerManager
          listenermap.put(source, listeners);
       }
       
-      Class<?> theClass = source.getClass();
-      while (theClass != Object.class)
+      if (!(source instanceof Class))
       {
-         // get list of listeners for the class
-         List<Object> classListeners = listenermap.get(theClass);
-         if (classListeners != null)
+         Class<?> theClass = source.getClass();
+         while (theClass != Object.class)
          {
-            // add it to list.
-            listeners.addAll(classListeners);
+            // get list of listeners for the class
+            List<Object> classListeners = listenermap.get(theClass);
+            if (classListeners != null)
+            {
+               // add it to list.
+               listeners.addAll(classListeners);
+            }
+            theClass = theClass.getSuperclass();
          }
-         theClass = theClass.getSuperclass();
       }
       return listeners;
    }
