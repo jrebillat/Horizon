@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import net.alantea.horizon.message.FunctionalSubscription;
 import net.alantea.horizon.message.Message;
 import net.alantea.horizon.message.Mode;
 
@@ -108,6 +109,10 @@ public class SendingManager
       {
          sendMessageToClassReceiver(message, (Class<?>) receiver);
       }
+      else if (receiver instanceof FunctionalSubscription)
+      {
+         sendMessageToFunctionalSubscriptionReceiver(message, (FunctionalSubscription)receiver);
+      }
       else
       {
          sendMessageToObjectReceiver(message, receiver);
@@ -137,6 +142,29 @@ public class SendingManager
          {
             // directly send
             sendToMethod(method, receiver, message);
+         }
+      }
+   }
+
+   /**
+    * Send message to a receiver object.
+    *
+    * @param message the message
+    * @param receiver the receiver
+    */
+   private static void sendMessageToFunctionalSubscriptionReceiver(Message message, FunctionalSubscription receiver)
+   {
+      if (receiver != null)
+      {
+         if (mode == Mode.CONCURRENT || mode == Mode.HYPERTHREADED)
+         {
+            // Create a thread to launch the call
+            new Thread(() -> receiver.onMessage(message));
+         }
+         else
+         {
+            // directly send
+            receiver.onMessage(message);
          }
       }
    }

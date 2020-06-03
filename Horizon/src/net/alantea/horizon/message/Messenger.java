@@ -258,6 +258,29 @@ public final class Messenger extends PropertyMonitor
    {
       SubscriptionManager.addSubscription(identifier, subscriber);
    }
+   
+   /**
+    * Add a functional subscriber to a message type in the default context.
+    *
+    * @param identifier the identifier
+    * @param subscriber the subscriber
+    */
+   public static final void addSubscription(String identifier, FunctionalSubscription subscriber)
+   {
+      addSubscription(SubscriptionManager.DEFAULTCONTEXT, identifier, subscriber);
+   }
+   
+   /**
+    * Add a functional subscriber to a message type in the given context.
+    *
+    * @param context the context
+    * @param identifier the identifier
+    * @param subscriber the subscriber
+    */
+   public static final void addSubscription(Object context, String identifier, FunctionalSubscription subscriber)
+   {
+      addSubscription(context, identifier, subscriber);
+   }
 
    /**
     * Adds the subscription.
