@@ -1,6 +1,7 @@
 package net.alantea.horizon.testng;
 
-import org.testng.annotations.Test;
+
+import org.junit.Test;
 
 import net.alantea.horizon.message.Messenger;
 import net.alantea.horizon.message.Mode;
@@ -25,14 +26,14 @@ public class SimpleMessageToUniverseTestHyperthreaded
       Messenger.registerAllMessages(listener1);
    }
    
-   @Test(groups="basis", dependsOnMethods = {"testSetMode", "testSetFirstListener"})
+   @Test
    public void testSendGlobalMessageToOneListener()
    {
       Messenger.sendMessage(this, null, TheListener.FIRSTID, 666, false);
       Messenger.sendMessage(this, null, TheListener.SECONDID, Math.PI, false);
    }
    
-   @Test(groups="basis", dependsOnMethods = {"testSendGlobalMessageToOneListener"})
+   @Test
    public void testSendSpecificMessage()
    {
       Messenger.sendMessage(this, null, TheListener.SPECIFICID, "specific", false);
@@ -40,25 +41,25 @@ public class SimpleMessageToUniverseTestHyperthreaded
       Messenger.sendMessage(this, null, TheListener.SPECIFICID, 123L, false);
    }
    
-   @Test(groups="basis", dependsOnMethods = {"testSendSpecificMessage"})
+   @Test
    public void testSendSpecialMessage()
    {
       Messenger.sendMessage(this, null, TheListener.SPECIALID, listener1, false);
    }
    
-   @Test(groups="basis", dependsOnMethods = {"testSendSpecialMessage"})
+   @Test
    public void testSendUnknownMessage()
    {
       Messenger.sendMessage(this, null, TheListener.ANOTHERID, true, false);
    }
    
-   @Test(dependsOnMethods = {"testSendSpecialMessage"})
+   @Test
    public void testSetSecondListener()
    {
       Messenger.registerAllMessages(listener2);
    }
    
-   @Test(dependsOnMethods = {"testSendGlobalMessageToOneListener", "testSetSecondListener"})
+   @Test
    public void testSendMessage2()
    {
       Messenger.sendMessage(this, null, TheListener.FIRSTID, 666, false);

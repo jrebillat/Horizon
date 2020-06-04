@@ -159,7 +159,7 @@ public class SendingManager
          if (mode == Mode.CONCURRENT || mode == Mode.HYPERTHREADED)
          {
             // Create a thread to launch the call
-            new Thread(() -> receiver.onMessage(message));
+            new Thread(() -> receiver.onMessage(message)).start();
          }
          else
          {
