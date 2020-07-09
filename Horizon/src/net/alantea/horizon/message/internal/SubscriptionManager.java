@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.alantea.horizon.message.FunctionalSubscription;
-
 /**
  * The Class SubscriptionManager, to manage objects that subscribe to one or several identifiers in one or several contexts.
  * It contains the methods to manage the subscription process for identifiers and contexts.
