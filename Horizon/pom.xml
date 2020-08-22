@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.alantea</groupId>
   <artifactId>horizon</artifactId>
-  <version>0.4.6-SNAPSHOT</version>
+  <version>0.4.9-SNAPSHOT</version>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>jar</packaging>
   <description>Messenging system</description>
@@ -107,10 +107,10 @@
   </build>
 	<url>https://github.com/jrebillat/Horizon.git/Horizon</url>
 	<scm>
-	    <connection>scm:git:git@github.com:jrebillat/Horizon.git</connection>
+	    <connection>scm:git:ssh://git@github.com:jrebillat/Horizon.git</connection>
 	    <url>scm:git:git@github.com:jrebillat/Horizon.git</url>
-	    <developerConnection>scm:git:git@github.com:jrebillat/Horizon.git</developerConnection>
-      <tag>horizon-0.4.5</tag>
+	    <developerConnection>scm:git:ssh://git@github.com:jrebillat/Horizon.git</developerConnection>
+      <tag>horizon-0.4.7</tag>
   </scm>
 	<dependencies>
 		<dependency>
