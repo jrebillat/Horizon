@@ -1,6 +1,5 @@
 package net.alantea.horizon.message;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface MessageTarget.
  */

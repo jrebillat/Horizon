@@ -67,8 +67,6 @@ public class SendingManager
     */
    private static void sendToWorld(Message message)
    {
-      
-      // TODO : differenciate register and subscribe
       // Get context
       Object context = (message.getContext() == null) ? SubscriptionManager.DEFAULTCONTEXT : message.getContext();
       

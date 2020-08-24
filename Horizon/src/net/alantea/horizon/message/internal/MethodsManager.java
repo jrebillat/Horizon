@@ -140,7 +140,7 @@ public class MethodsManager
          }
 
          // search for parameter interfaces for parameter class and all super classes
-         // TODO (but just one level deep, don't get interfaces extended by interfaces)
+         // (but just one level deep, don't get interfaces extended by interfaces)
          if ((ret == null))
          {
             // rewind to parameter
@@ -152,7 +152,6 @@ public class MethodsManager
                int i = 0;
                while ((ret == null) && (i < itfs.length) && ((!itfs[i].equals(Object.class))))
                {
-                  // TODO why not use 'ret = meths.get(itfs[i]);' ???
                   ret = getMethodRecursively(managedClass, identifier, itfs[i], staticFlag);
                   i++;
                }
@@ -224,7 +223,6 @@ public class MethodsManager
                Receive[] annotations = method.getAnnotationsByType(Receive.class);
                for (Receive annotation : annotations)
                {
-                  // TODO ?????
                   // Yep, that's one ! Register in map.
                   if (!("".equals(annotation.message())) || (annotation.messages().length == 0))
                   {
