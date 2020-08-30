@@ -110,7 +110,7 @@
 	    <connection>scm:git:ssh://git@github.com:jrebillat/Horizon.git</connection>
 	    <url>scm:git:git@github.com:jrebillat/Horizon.git</url>
 	    <developerConnection>scm:git:ssh://git@github.com:jrebillat/Horizon.git</developerConnection>
-      <tag>horizon-0.4.7</tag>
+      <tag>horizon-0.4.10</tag>
   </scm>
 	<dependencies>
 		<dependency>
